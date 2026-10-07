@@ -7,6 +7,7 @@ const required = [
   "tasks/lessons.md",
   "tasks/handoff.md",
   "evals/backend-foundation.md",
+  "evals/frontend-foundation.md",
   "supabase/config.toml"
 ];
 
