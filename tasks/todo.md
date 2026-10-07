@@ -5,27 +5,28 @@
 - [x] Remove local repository clone
 - [x] Add environment and secret-exclusion contracts
 - [x] Add GitHub Actions remote validation
-- [ ] Initialize Supabase from a GitHub-hosted workflow or Codespace
-- [ ] Confirm Supabase project credentials through a secure channel
+- [ ] Configure remote Supabase project credentials
 
 ## Phase 1: Monorepo contract
-- [x] Add pnpm workspace definition
-- [x] Add Turborepo task graph
-- [x] Add apps/org boundary
-- [x] Add apps/net boundary
-- [x] Add packages/ui boundary
+- [x] Add pnpm workspace and Turborepo task graph
+- [x] Add apps/org, apps/net, and packages/ui boundaries
 - [x] Add deterministic workspace validation
 
-## Backend
-- [ ] Add schema and migrations
-- [ ] Add seed data
-- [ ] Add RLS policies
-- [ ] Add test-mode payment Edge Function
+## Phase 2: Backend contract
+- [x] Add schema for profiles, artisans, craft items, workshops, bookings, and orders
+- [x] Add provenance UUID and local-pickup fields
+- [x] Add PDPA consent and marketing fields
+- [x] Add role-aware RLS policies and signup trigger
+- [x] Add deterministic seed data
+- [x] Add test-mode payment Edge Function
+- [ ] Apply migration to live Supabase project
+- [ ] Verify migration and RLS against live project
 
 ## Checkpoint: Backend handoff
 - [ ] Remote checks pass
-- [ ] Update tasks/handoff.md
+- [ ] Live Supabase migration verified
+- [ ] Frontend agent begins implementation
 
 ## Review
 - GitHub-only execution adopted.
-- Monorepo boundaries and remote validation workflow added.
+- Backend schema, seed, RLS, auth trigger, and test payment contract are present remotely.
