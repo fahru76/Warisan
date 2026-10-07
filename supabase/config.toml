@@ -1,0 +1,12 @@
+# Supabase CLI configuration placeholder.
+# This file is intentionally project-agnostic until a Supabase project ref exists.
+project_id = "warisan-local-placeholder"
+
+[api]
+enabled = true
+
+[db]
+port = 54322
+
+[studio]
+enabled = false
