@@ -1,0 +1,12 @@
+{
+  "name": "warisan",
+  "private": true,
+  "packageManager": "pnpm@10.4.1",
+  "scripts": {
+    "validate": "node scripts/validate-workspace.mjs",
+    "typecheck": "pnpm --recursive run typecheck"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
