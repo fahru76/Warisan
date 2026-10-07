@@ -27,3 +27,10 @@ Claude Agent can build against the committed schema. If frontend work needs an R
 - Role/auth migration initially failed because the GitHub copy contained malformed dollar-quote delimiters; corrected SQL was applied remotely and verified.
 - Seed verification currently shows 5 artisans, 1 craft item, and 1 workshop. The full 10-item/3-workshop seed was not applied; this remains incomplete.
 - Payment Edge Function has not been deployed.
+
+
+## Final live deployment verification
+- Full seed now verified: 5 artisans, 10 craft items, 3 workshops.
+- Edge Function `create-payment-intent` deployed successfully, version 1, ACTIVE, JWT verification enabled.
+- Live function smoke test returned HTTP 200 with a test-mode payment intent.
+- GitHub Actions secret setup was not used; deployment was performed through the Supabase Management API.
