@@ -19,3 +19,11 @@ The migration and Edge Function are not deployed to a live Supabase project. Dep
 
 ## Frontend contract
 Claude Agent can build against the committed schema. If frontend work needs an RPC, add the request here before implementation.
+
+
+## Live Supabase verification
+- Project ref: `wkreaniwmbditbshksja`
+- Initial schema migration applied successfully through the Supabase Management API.
+- Role/auth migration initially failed because the GitHub copy contained malformed dollar-quote delimiters; corrected SQL was applied remotely and verified.
+- Seed verification currently shows 5 artisans, 1 craft item, and 1 workshop. The full 10-item/3-workshop seed was not applied; this remains incomplete.
+- Payment Edge Function has not been deployed.
