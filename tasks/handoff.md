@@ -34,3 +34,11 @@ Claude Agent can build against the committed schema. If frontend work needs an R
 - Edge Function `create-payment-intent` deployed successfully, version 1, ACTIVE, JWT verification enabled.
 - Live function smoke test returned HTTP 200 with a test-mode payment intent.
 - GitHub Actions secret setup was not used; deployment was performed through the Supabase Management API.
+
+
+## P0 security remediation
+- Confirmed corrupted control bytes in the committed role migration.
+- Repaired the migration and restored the complete seed file in GitHub.
+- Applied live hardening: client users cannot change `profiles.role`; only unverified artisan rows may be self-created; artisan verification is admin-managed.
+- Added database triggers rejecting role escalation and unauthorized verification changes.
+- Verified the hardened policy set remotely.
