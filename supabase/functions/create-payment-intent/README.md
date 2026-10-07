@@ -1,0 +1,1 @@
+Test-mode payment intent contract. POST with Idempotency-Key and JSON orderId plus amountMyr. No provider or secret is used.
