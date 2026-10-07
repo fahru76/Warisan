@@ -40,7 +40,7 @@ export function ProvenancePage() {
   const state = useAsync(() => (id ? api.getProvenance(id) : Promise.resolve({ data: null, source: "fixture" as const })), [id]);
   const record = state.status === "success" ? state.value.data : null;
   useSeo({
-    title: record ? `${record.item.name} — ${t("org.provenance.authentic")} · Warisan.org` : `${t("org.provenance.title")} — Warisan.org`,
+    title: record ? `${record.item.name} — ${t(record.verified ? "org.provenance.authentic" : "org.provenance.unverified")} · Warisan.org` : `${t("org.provenance.title")} — Warisan.org`,
     description: record ? `${record.item.name} by ${record.artisan?.name ?? "—"}. ${t("org.provenance.provenanceId")}: ${record.item.provenance_id}` : t("org.provenance.subtitle"),
     siteName: "Warisan.org",
     image: record ? placeholderImage(record.item.id, "product") : undefined
@@ -55,6 +55,14 @@ export function ProvenancePage() {
               <ShieldAlert className="size-12 text-red-700" aria-hidden />
               <h1 className="font-display text-3xl text-ink">{t("org.provenance.title")}</h1>
               <p role="alert" className="max-w-md text-muted">{id ? t("org.provenance.notFound") : t("org.provenance.invalid")}</p>
+              <Link to="/provenance" className="font-semibold text-brand underline underline-offset-4">{t("org.provenance.lookup")}</Link>
+            </GlassCard>
+          ) : !res.data.verified ? (
+            <GlassCard className="flex flex-col items-center gap-4 border-amber-300 p-10 text-center">
+              <ShieldAlert className="size-12 text-amber-700" aria-hidden />
+              <h1 className="font-display text-3xl text-ink">{t("org.provenance.unverified")}</h1>
+              <p role="alert" className="max-w-md text-muted">{t("org.provenance.unverifiedBody")}</p>
+              <p className="break-all font-mono text-xs text-muted">{res.data.item.provenance_id}</p>
               <Link to="/provenance" className="font-semibold text-brand underline underline-offset-4">{t("org.provenance.lookup")}</Link>
             </GlassCard>
           ) : (

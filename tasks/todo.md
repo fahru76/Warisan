@@ -55,3 +55,13 @@
 - [ ] QR code render + print view on `/provenance/:id`
 - [ ] Route-level code splitting; prerender OG tags
 - [ ] Replace placeholder logo with final SVG when supplied
+
+## Phase 3.1: H-12 frontend trust gate (Claude Agent, 2026-10-07)
+- [x] Verify Hermes P0 remediation in git + live (H-1..H-4 closed)
+- [x] File H-12..H-15 in `tasks/handoff.md`
+- [x] Eval first: `evals/trust.test.ts` (failed 6/7 before fix)
+- [x] Data layer: listings/detail require a verified maker (`artisans!inner` join live, same rule on fixtures); `getArtisan` public lookup verified-only
+- [x] Provenance page: "Maker not verified" state; never shows "authentic" for unverified makers
+- [x] `pnpm test` 64/64, typecheck 3/3, build 2/2
+- [x] Live check as `anon` via SQL: verified join returns 10/10 items, 3/3 workshops (no regression)
+- [ ] Not verified: PostgREST `!inner` embed syntax against live REST (sandbox egress blocks *.supabase.co) — check on first `.env.local` run
