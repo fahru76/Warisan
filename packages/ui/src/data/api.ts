@@ -1,6 +1,6 @@
 import { getSupabase } from "./supabase";
 import { fixtureArtisans, fixtureCraftItems, fixtureWorkshops } from "./fixtures";
-import type { Artisan, CraftItem, Result, Workshop } from "./types";
+import type { Artisan, CraftItem, Order, OrderStatus, Result, Workshop } from "./types";
 
 const ARTISAN_COLS = "id,profile_id,name,craft_specialty,bio,location,is_verified";
 const ITEM_COLS = "id,artisan_id,name,description,price_myr,provenance_id,is_local_pickup_only,is_published,created_at";
@@ -132,4 +132,55 @@ export async function verifyArtisan(id: string): Promise<void> {
   if (!sb) return;
   const { error } = await sb.from("artisans").update({ is_verified: true }).eq("id", id);
   if (error) throw error;
+}
+
+/** The signed-in customer's orders. RLS (orders_own / order_items_own) scopes rows to the caller. */
+export async function listMyOrders(): Promise<Result<Order[]>> {
+  const sb = getSupabase();
+  if (!sb) return fixture([]);
+  const { data, error } = await sb
+    .from("orders")
+    .select("id,status,total_myr,created_at,order_items(craft_item_id,quantity,unit_price_myr,craft_items(name))")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  type Row = { id: string; status: OrderStatus; total_myr: number | string; created_at: string; order_items: { craft_item_id: string; quantity: number; unit_price_myr: number | string; craft_items: { name: string } | null }[] };
+  return {
+    data: (data as unknown as Row[]).map((o) => ({
+      id: o.id,
+      status: o.status,
+      total_myr: Number(o.total_myr),
+      created_at: o.created_at,
+      lines: o.order_items.map((l) => ({ craft_item_id: l.craft_item_id, quantity: l.quantity, unit_price_myr: Number(l.unit_price_myr), name: l.craft_items?.name ?? null }))
+    })),
+    source: "live"
+  };
+}
+
+export type BookingOutcome = "booked" | "demo" | "full" | "duplicate" | "unavailable" | "error";
+
+/** Maps a bookings insert error to a user-facing outcome (capacity trigger, unique constraint, RLS). */
+export function bookingOutcomeFromError(error: { code?: string; message?: string }): BookingOutcome {
+  if (error.message?.includes("workshop capacity exceeded")) return "full";
+  if (error.code === "23505") return "duplicate";
+  if (error.code === "42501") return "unavailable";
+  return "error";
+}
+
+/**
+ * Requests a pending booking. The database enforces the rules: status must be 'pending', consent is
+ * required and re-stamped with server time, the workshop must be published, upcoming and run by a
+ * verified artisan, and capacity is checked under a row lock.
+ */
+export async function requestBooking(input: { workshopId: string; customerId: string; quantity: number; pdpaConsent: boolean }): Promise<BookingOutcome> {
+  if (!input.pdpaConsent) return "error";
+  const sb = getSupabase();
+  if (!sb) return "demo";
+  const { error } = await sb.from("bookings").insert({
+    workshop_id: input.workshopId,
+    customer_id: input.customerId,
+    quantity: input.quantity,
+    // Any non-null value marks consent; the stamp_booking_consent trigger replaces it with now().
+    pdpa_consent_date: new Date().toISOString()
+  });
+  return error ? bookingOutcomeFromError(error) : "booked";
 }

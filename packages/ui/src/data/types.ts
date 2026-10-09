@@ -43,6 +43,31 @@ export interface Workshop {
   is_published: boolean;
 }
 
+/** Must match bookings_status_check (migration 20261009000400). */
+export const BOOKING_STATUSES = ["pending", "confirmed", "cancelled", "completed"] as const;
+export type BookingStatus = (typeof BOOKING_STATUSES)[number];
+
+/** Must match orders_status_check (migration 20261009000500). */
+export const ORDER_STATUSES = ["pending", "paid", "processing", "fulfilled", "cancelled", "refunded", "failed"] as const;
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export interface OrderLine {
+  craft_item_id: string;
+  quantity: number;
+  /** Price captured server-side by create_order; never supplied by the client. */
+  unit_price_myr: number;
+  /** Null when the piece is no longer publicly listed. */
+  name: string | null;
+}
+
+export interface Order {
+  id: string;
+  status: OrderStatus;
+  total_myr: number;
+  created_at: string;
+  lines: OrderLine[];
+}
+
 export type DataSource = "live" | "fixture";
 
 export interface Result<T> {

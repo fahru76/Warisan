@@ -8,7 +8,7 @@ export function DirectoryPage() {
   const state = useAsync(() => api.listArtisans(), []);
   return (
     <Container className="py-16">
-      <SectionHeading eyebrow="Warisan.org" title={t("org.directory.title")} subtitle={t("org.directory.subtitle")} />
+      <SectionHeading as="h1" eyebrow="Warisan.org" title={t("org.directory.title")} subtitle={t("org.directory.subtitle")} />
       <Async state={state}>
         {(res) => (
           <div className="space-y-6">

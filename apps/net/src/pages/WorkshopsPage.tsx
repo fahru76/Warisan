@@ -8,7 +8,7 @@ export function WorkshopsPage() {
   const state = useAsync(() => Promise.all([api.listWorkshops(), api.listArtisans()]), []);
   return (
     <Container className="py-16">
-      <SectionHeading eyebrow="Adiguru Kraf" title={t("net.workshops.title")} subtitle={t("net.workshops.subtitle")} />
+      <SectionHeading as="h1" eyebrow="Adiguru Kraf" title={t("net.workshops.title")} subtitle={t("net.workshops.subtitle")} />
       <Async state={state}>
         {([workshops, artisans]) => {
           const nameOf = new Map(artisans.data.map((a) => [a.id, a.name]));

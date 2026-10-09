@@ -183,3 +183,27 @@ Added deterministic unit tests in `supabase/functions/create-payment-intent/hand
 - `@warisan/supabase-types`: `CreatePaymentIntentInput` no longer contains `amountMyr`, so frontend code cannot be steered into sending prices. Order, booking and `create_order` types now match the live constraints.
 
 **Backend authorization gate: complete for the current scope** (profiles, artisans, inventory, bookings, orders, payment intent).
+
+## Server-trusted PDPA consent — 2026-10-09 (Claude)
+
+Tickets H-11 and H-7 (consent part). Before this change, the live `handle_new_user` ignored the signup metadata the frontend sends, so **a customer's PDPA consent was never recorded** (`profiles.pdpa_consent_date` stayed null). Booking consent also took the browser's clock.
+
+Migration `20261009000700_server_trusted_pdpa_consent.sql`:
+- **Signup:** `handle_new_user` stamps `pdpa_consent_date = now()` only when `pdpa_consent` is true. Marketing opt-in is stored only when consent is also given.
+- **Artisan applications:** if `applying_as = 'artisan'` with consent, a craft and a location, an **unverified** artisan row is created. The role is never read from metadata.
+- **Bookings:** `bookings_insert_own` now also requires `pdpa_consent_date is not null`. The new `stamp_booking_consent` trigger replaces any client-sent timestamp with `now()`.
+
+Script: `supabase/tests/pdpa_consent.sql` (rolls back). The first run caught a bug: a missing `marketing_opt_in` key made the value NULL and signup failed on the NOT NULL column. It was fixed with `coalesce`. Results with the fixed migration loaded:
+
+| # | Case | Result |
+|---|---|---|
+| S1 | consent + marketing | consent stamped (server time), marketing true, role customer ✅ |
+| S2 | no consent, marketing ticked | consent null, marketing false ✅ |
+| S3 | artisan application | 1 unverified artisan row, role customer ✅ |
+| S4 | metadata `role: admin` injection | role customer, no artisan row ✅ |
+| S5 | artisan application without location | no artisan row ✅ |
+| S6 | no metadata at all | profile created, consent null, marketing false ✅ |
+| B1 | booking with client time 2001-01-01 | stored server time ✅ |
+| B2 | booking without consent | DENIED 42501 ✅ |
+
+The migration is committed but **not yet applied live**.

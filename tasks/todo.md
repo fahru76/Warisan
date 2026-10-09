@@ -111,10 +111,13 @@
 
 ## Phase 5: Warisan.net commerce UI (approved 2026-10-09; production domain warisan.net; hosting TBD)
 - [x] Adopt the working frontend from `claude/new-session-b00fhf` (the frontend on main did not compile)
-- [ ] Wire checkout to live `create_order` RPC + hardened `create-payment-intent` (orderId only)
-- [ ] Customer sign-in/sign-up (Supabase Auth) with PDPA consent capture
-- [ ] Catalog of published items from verified artisans (live smoke test)
-- [ ] Customer order history (RLS-scoped)
-- [ ] Workshop listing and pending booking flow (matches live bookings_insert_own policy + capacity trigger)
+- [x] Wire checkout to live `create_order` RPC + hardened `create-payment-intent` (orderId only; sign-in required when live)
+- [x] Customer sign-in/sign-up UI (existing) + server-trusted PDPA consent at signup (migration 20261009000700, S1–S6 pass in rollback)
+- [x] Customer order history on /account (RLS-scoped `listMyOrders`)
+- [x] Workshop booking via `api.requestBooking`: consent required + server-stamped (000700, B1–B2), friendly capacity/duplicate/unavailable errors
+- [x] Evals: `evals/checkout-contract.test.ts` (12 tests; 76/76 total), typecheck 3/3, build 2/2
+- [ ] Apply migration 20261009000700 live and re-run `supabase/tests/pdpa_consent.sql` (Hermes)
+- [ ] Live browser smoke test against Supabase (blocked in Claude's sandbox: *.supabase.co egress denied) — run from a machine/preview with `VITE_SUPABASE_*` set
+- [ ] Open tickets still relevant: H-5 timezone, H-8 get_provenance (optional), H-9 image columns, H-10 CORS allow-list for warisan.net, H-15 deterministic seed provenance ids
 - [ ] Hosting decision → Supabase Site URL `https://warisan.net` + redirect allow-list (Hermes)
 - [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` by name in the apps/net preview environment (Hermes)

@@ -17,7 +17,7 @@ export { LEGAL_PATHS, LEGAL_DOC_BY_PATH, type LegalPath, type LegalDoc } from ".
 export { LegalPage } from "./legal/LegalPage";
 
 export { useSession, fetchProfile, signInWithPassword, signUp, signOut, DOMAIN_ROLES, type SignUpInput } from "./auth/useSession";
-export { createPaymentIntent, PaymentError, type PaymentIntent, type FpxProvider } from "./payments";
+export { createOrder, createPaymentIntent, PaymentError, type CreateOrderInput, type CreateIntentInput, type PaymentIntent, type FpxProvider } from "./payments";
 
 export { BrandMark } from "./components/BrandMark";
 export { Button, ButtonLink, buttonClass } from "./components/Button";

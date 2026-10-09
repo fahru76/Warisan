@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, LogOut } from "lucide-react";
-import { Button, Container, Field, GlassCard, Notice, PdpaConsent, SectionHeading, cn, signInWithPassword, signOut, signUp, useSeo, useSession } from "@warisan/ui";
+import { Async, Button, Container, Field, GlassCard, Notice, PdpaConsent, SectionHeading, api, cn, formatKlDateTime, formatMyr, signInWithPassword, signOut, signUp, toLang, useAsync, useSeo, useSession } from "@warisan/ui";
 
 export function AccountPage() {
   const { t } = useTranslation();
@@ -11,7 +11,7 @@ export function AccountPage() {
 
   return (
     <Container className="max-w-lg py-16">
-      <SectionHeading title={t("net.account.title")} />
+      <SectionHeading as="h1" title={t("net.account.title")} />
       <GlassCard className="p-6 sm:p-8">
         {!live ? (
           <Notice>{t("net.account.offline")}</Notice>
@@ -19,6 +19,7 @@ export function AccountPage() {
           <div className="space-y-5">
             <p className="text-ink">{t("net.account.signedInAs")} <strong>{user.email}</strong></p>
             <Button variant="secondary" onClick={() => void signOut()}><LogOut className="size-4" aria-hidden /> {t("common.signOut")}</Button>
+            <OrderHistory userId={user.id} />
           </div>
         ) : (
           <>
@@ -34,6 +35,47 @@ export function AccountPage() {
         )}
       </GlassCard>
     </Container>
+  );
+}
+
+function OrderHistory({ userId }: { userId: string }) {
+  const { t, i18n } = useTranslation();
+  const lang = toLang(i18n.language);
+  const state = useAsync(() => api.listMyOrders(), [userId]);
+  return (
+    <section aria-labelledby="orders-heading" className="border-t border-line pt-5">
+      <h2 id="orders-heading" className="font-display text-xl text-ink">{t("net.account.orders")}</h2>
+      <Async state={state}>
+        {({ data }) =>
+          data.length === 0 ? (
+            <p className="mt-3 text-sm text-muted">{t("net.account.ordersEmpty")}</p>
+          ) : (
+            <ul className="mt-3 space-y-3">
+              {data.map((order) => (
+                <li key={order.id} className="rounded-2xl border border-line p-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <span className="text-sm text-muted">{formatKlDateTime(order.created_at, lang)} MYT</span>
+                    <span className="text-sm font-semibold text-ink">{t(`net.orderStatus.${order.status}`)}</span>
+                  </div>
+                  <ul className="mt-2 space-y-1 text-sm text-ink">
+                    {order.lines.map((line) => (
+                      <li key={line.craft_item_id} className="flex justify-between gap-3">
+                        <span>{line.name ?? t("net.account.unlisted")} × {line.quantity}</span>
+                        <span>{formatMyr(line.unit_price_myr * line.quantity, lang)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 flex justify-between border-t border-line pt-2 font-semibold text-ink">
+                    <span>{t("net.checkout.total")}</span>
+                    <span>{formatMyr(order.total_myr, lang)}</span>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </Async>
+    </section>
   );
 }
 

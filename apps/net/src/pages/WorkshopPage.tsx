@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, CheckCircle2, Users } from "lucide-react";
-import { Async, Button, ButtonLink, Container, DemoNotice, Field, GlassCard, Notice, PdpaConsent, SmartImage, api, formatKlDateTime, formatKlTime, formatMyr, getSupabase, placeholderImage, toLang, useAsync, useSeo, useSession, type Workshop } from "@warisan/ui";
+import { Async, Button, ButtonLink, Container, DemoNotice, Field, GlassCard, Notice, PdpaConsent, SmartImage, api, formatKlDateTime, formatKlTime, formatMyr, placeholderImage, toLang, useAsync, useSeo, useSession, type Workshop } from "@warisan/ui";
 import { NET_ROUTES } from "../routePaths";
 import { NotFoundPage } from "./NotFoundPage";
 
@@ -52,6 +52,7 @@ function BookingForm({ workshop }: { workshop: Workshop }) {
   const { user, live } = useSession();
   const [qty, setQty] = useState(1);
   const [status, setStatus] = useState<"idle" | "busy" | "done" | "offline">("idle");
+  const outcomeMessage = { full: t("net.booking.full"), duplicate: t("net.booking.duplicate"), unavailable: t("net.booking.unavailable"), error: t("common.error") } as const;
   const [error, setError] = useState<string | null>(null);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -59,23 +60,14 @@ function BookingForm({ workshop }: { workshop: Workshop }) {
     const form = new FormData(e.currentTarget);
     if (form.get("pdpa_consent") !== "yes") return setError(t("pdpa.required"));
     setError(null);
-    const sb = getSupabase();
-    if (!sb) return setStatus("offline");
+    if (!live) return setStatus("offline");
     if (!user) return setError(t("net.booking.signInRequired"));
     setStatus("busy");
-    // Direct insert is allowed by bookings_insert_own; switches to book_workshop RPC (capacity-safe) once ticket H-7 lands.
-    const { error: insertError } = await sb.from("bookings").insert({
-      workshop_id: workshop.id,
-      customer_id: user.id,
-      quantity: qty,
-      pdpa_consent_date: new Date().toISOString()
-    });
-    if (insertError) {
-      setError(insertError.message);
-      setStatus("idle");
-    } else {
-      setStatus("done");
-    }
+    const outcome = await api.requestBooking({ workshopId: workshop.id, customerId: user.id, quantity: qty, pdpaConsent: true });
+    if (outcome === "booked") return setStatus("done");
+    if (outcome === "demo") return setStatus("offline");
+    setError(outcomeMessage[outcome]);
+    setStatus("idle");
   };
 
   return (

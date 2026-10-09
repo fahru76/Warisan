@@ -163,7 +163,10 @@ const en = {
       submit: "Confirm booking",
       success: "Booking requested. We will email your confirmation.",
       signInRequired: "Please sign in or create an account to book.",
-      offline: "Demo mode: Supabase is not connected, so no booking was made."
+      offline: "Demo mode: Supabase is not connected, so no booking was made.",
+      full: "Not enough seats left for that many participants.",
+      duplicate: "You have already booked this workshop.",
+      unavailable: "This workshop is no longer open for booking."
     },
     checkout: {
       title: "Checkout",
@@ -176,7 +179,19 @@ const en = {
       total: "Total",
       pay: "Pay with FPX",
       success: "Test payment intent created",
-      reference: "Reference"
+      reference: "Reference",
+      signInRequired: "Please sign in or create an account to check out.",
+      notAvailable: "This piece is no longer available.",
+      order: "Order"
+    },
+    orderStatus: {
+      pending: "Awaiting payment",
+      paid: "Paid",
+      processing: "Processing",
+      fulfilled: "Fulfilled",
+      cancelled: "Cancelled",
+      refunded: "Refunded",
+      failed: "Payment failed"
     },
     account: {
       title: "Your account",
@@ -185,7 +200,10 @@ const en = {
       register: "Create account",
       registered: "Account created. Check your email to confirm.",
       signedInAs: "Signed in as",
-      offline: "Demo mode: Supabase is not connected."
+      offline: "Demo mode: Supabase is not connected.",
+      orders: "Your orders",
+      ordersEmpty: "You have no orders yet.",
+      unlisted: "Piece no longer listed"
     }
   },
   seo: {
@@ -357,7 +375,10 @@ const ms: Shape<typeof en> = {
       submit: "Sahkan tempahan",
       success: "Tempahan diminta. Kami akan menghantar pengesahan melalui e-mel.",
       signInRequired: "Sila log masuk atau cipta akaun untuk menempah.",
-      offline: "Mod demo: Supabase tidak disambungkan, jadi tiada tempahan dibuat."
+      offline: "Mod demo: Supabase tidak disambungkan, jadi tiada tempahan dibuat.",
+      full: "Tempat tidak mencukupi untuk bilangan peserta itu.",
+      duplicate: "Anda telah pun menempah bengkel ini.",
+      unavailable: "Bengkel ini tidak lagi dibuka untuk tempahan."
     },
     checkout: {
       title: "Pembayaran",
@@ -370,7 +391,19 @@ const ms: Shape<typeof en> = {
       total: "Jumlah",
       pay: "Bayar dengan FPX",
       success: "Niat pembayaran ujian dicipta",
-      reference: "Rujukan"
+      reference: "Rujukan",
+      signInRequired: "Sila log masuk atau cipta akaun untuk membuat pembayaran.",
+      notAvailable: "Karya ini tidak lagi tersedia.",
+      order: "Pesanan"
+    },
+    orderStatus: {
+      pending: "Menunggu bayaran",
+      paid: "Dibayar",
+      processing: "Sedang diproses",
+      fulfilled: "Selesai",
+      cancelled: "Dibatalkan",
+      refunded: "Dikembalikan",
+      failed: "Bayaran gagal"
     },
     account: {
       title: "Akaun anda",
@@ -379,7 +412,10 @@ const ms: Shape<typeof en> = {
       register: "Cipta akaun",
       registered: "Akaun dicipta. Semak e-mel anda untuk pengesahan.",
       signedInAs: "Log masuk sebagai",
-      offline: "Mod demo: Supabase tidak disambungkan."
+      offline: "Mod demo: Supabase tidak disambungkan.",
+      orders: "Pesanan anda",
+      ordersEmpty: "Anda belum mempunyai pesanan.",
+      unlisted: "Karya tidak lagi disenaraikan"
     }
   },
   seo: {

@@ -1,4 +1,6 @@
 -- Public inventory and booking authorization tests. Same contract as authz_negative_paths.sql:
+-- Booking inserts pass consent (required since migration 20261009000700) so these cases test status,
+-- visibility and capacity rather than consent; consent itself is covered by pdpa_consent.sql.
 -- run as postgres; everything is rolled back by the final QA_ROLLBACK exception; read results from it.
 do $qa$
 declare
@@ -39,23 +41,23 @@ begin
   -- customer bookings
   perform set_config('request.jwt.claims', json_build_object('sub',c,'role','authenticated')::text, true);
   perform set_config('role','authenticated', true);
-  begin insert into public.bookings(workshop_id,customer_id,status,quantity) values (ws,c,'confirmed',1); r := r||'T27 customer self-confirmed booking: ALLOWED'::text;
+  begin insert into public.bookings(workshop_id,customer_id,status,quantity,pdpa_consent_date) values (ws,c,'confirmed',1,now()); r := r||'T27 customer self-confirmed booking: ALLOWED'::text;
   exception when others then r := r||('T27 customer self-confirmed booking: DENIED '||sqlstate||' '||sqlerrm); end;
-  begin insert into public.bookings(workshop_id,customer_id,quantity) values (unpub_ws,c,1); r := r||'T28 customer book unpublished workshop: ALLOWED'::text;
+  begin insert into public.bookings(workshop_id,customer_id,quantity,pdpa_consent_date) values (unpub_ws,c,1,now()); r := r||'T28 customer book unpublished workshop: ALLOWED'::text;
   exception when others then r := r||('T28 customer book unpublished workshop: DENIED '||sqlstate||' '||sqlerrm); end;
-  begin insert into public.bookings(workshop_id,customer_id,quantity) values (ws,c,99); r := r||'T29 customer book qty 99 on capacity 2: ALLOWED'::text;
+  begin insert into public.bookings(workshop_id,customer_id,quantity,pdpa_consent_date) values (ws,c,99,now()); r := r||'T29 customer book qty 99 on capacity 2: ALLOWED'::text;
   exception when others then r := r||('T29 customer book over capacity: DENIED '||sqlstate||' '||sqlerrm); end;
-  begin insert into public.bookings(workshop_id,customer_id,quantity) values (ws,c,1); r := r||'T30 customer pending booking qty 1: allowed'::text;
+  begin insert into public.bookings(workshop_id,customer_id,quantity,pdpa_consent_date) values (ws,c,1,now()); r := r||'T30 customer pending booking qty 1: allowed'::text;
   exception when others then r := r||('T30 customer pending booking qty 1: ERROR '||sqlstate||' '||sqlerrm); end;
   perform set_config('role','postgres', true);
 
   perform set_config('request.jwt.claims', json_build_object('sub',c2,'role','authenticated')::text, true);
   perform set_config('role','authenticated', true);
-  begin insert into public.bookings(workshop_id,customer_id,quantity) values (ws,c2,2); r := r||'T31 second customer qty 2 with 1 seat left: ALLOWED'::text;
+  begin insert into public.bookings(workshop_id,customer_id,quantity,pdpa_consent_date) values (ws,c2,2,now()); r := r||'T31 second customer qty 2 with 1 seat left: ALLOWED'::text;
   exception when others then r := r||('T31 second customer qty 2 with 1 seat left: DENIED '||sqlstate||' '||sqlerrm); end;
-  begin insert into public.bookings(workshop_id,customer_id,quantity) values (ws,c2,1); r := r||'T32 second customer takes last seat: allowed'::text;
+  begin insert into public.bookings(workshop_id,customer_id,quantity,pdpa_consent_date) values (ws,c2,1,now()); r := r||'T32 second customer takes last seat: allowed'::text;
   exception when others then r := r||('T32 second customer takes last seat: ERROR '||sqlstate||' '||sqlerrm); end;
-  begin insert into public.bookings(workshop_id,customer_id,quantity) values (ws,c,1); r := r||'T33 duplicate booking same customer: ALLOWED'::text;
+  begin insert into public.bookings(workshop_id,customer_id,quantity,pdpa_consent_date) values (ws,c,1,now()); r := r||'T33 duplicate booking same customer: ALLOWED'::text;
   exception when others then r := r||('T33 duplicate booking same customer: DENIED '||sqlstate||' '||sqlerrm); end;
   perform set_config('role','postgres', true);
 

@@ -2,7 +2,8 @@ import { useState, type FormEvent } from "react";
 import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { CheckCircle2, FlaskConical, Landmark } from "lucide-react";
-import { Async, Button, Container, GlassCard, Notice, PdpaConsent, SmartImage, api, createPaymentIntent, formatMyr, placeholderImage, toLang, useAsync, useSeo, type PaymentIntent } from "@warisan/ui";
+import { Async, Button, ButtonLink, Container, GlassCard, Notice, PaymentError, PdpaConsent, SmartImage, api, createOrder, createPaymentIntent, formatMyr, placeholderImage, toLang, useAsync, useSeo, useSession, type PaymentIntent } from "@warisan/ui";
+import { NET_ROUTES } from "../routePaths";
 import { NotFoundPage } from "./NotFoundPage";
 
 export function CheckoutPage() {
@@ -10,6 +11,8 @@ export function CheckoutPage() {
   const { t, i18n } = useTranslation();
   const lang = toLang(i18n.language);
   const state = useAsync(() => api.getCraftItem(craftId), [craftId]);
+  const { user, live } = useSession();
+  const needsSignIn = live && !user;
   const [fulfilment, setFulfilment] = useState<"delivery" | "pickup">("delivery");
   const [intent, setIntent] = useState<PaymentIntent | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -31,10 +34,13 @@ export function CheckoutPage() {
           setError(null);
           setBusy(true);
           try {
-            // Draft order id until create_order RPC (ticket H-6) returns a real one.
-            setIntent(await createPaymentIntent({ orderId: idempotencyKey, amountMyr: item.price_myr, idempotencyKey }));
+            // Prices are never sent: create_order prices the line server-side and the payment
+            // function reads the amount from that pending order. The same key makes retries idempotent.
+            const orderId = await createOrder({ items: [{ craftItemId: item.id, quantity: 1 }], idempotencyKey });
+            setIntent(await createPaymentIntent({ orderId, idempotencyKey, demoAmountMyr: item.price_myr }));
           } catch (err) {
-            setError(err instanceof Error ? err.message : t("common.error"));
+            if (err instanceof PaymentError && err.message.includes("not available")) setError(t("net.checkout.notAvailable"));
+            else setError(err instanceof Error ? err.message : t("common.error"));
           } finally {
             setBusy(false);
           }
@@ -59,6 +65,7 @@ export function CheckoutPage() {
                   <div role="status" className="flex flex-col items-center gap-3 py-10 text-center">
                     <CheckCircle2 className="size-12 text-brand" aria-hidden />
                     <p className="text-lg font-medium text-ink">{t("net.checkout.success")}</p>
+                    <p className="text-sm text-muted">{t("net.checkout.order")}: <span className="font-mono">{intent.orderId}</span></p>
                     <p className="text-sm text-muted">{t("net.checkout.reference")}: <span className="font-mono">{intent.paymentIntentId}</span></p>
                     <p className="text-sm text-muted">{formatMyr(intent.amountMyr, lang)} · {intent.status}</p>
                   </div>
@@ -94,7 +101,13 @@ export function CheckoutPage() {
                     </div>
                     {error && <p role="alert" className="text-sm font-medium text-red-700">{error}</p>}
                     <Notice>{t("net.checkout.testMode")}</Notice>
-                    <Button type="submit" size="lg" className="w-full" disabled={busy}>{t("net.checkout.pay")}</Button>
+                    {needsSignIn && (
+                      <div className="space-y-3">
+                        <Notice>{t("net.checkout.signInRequired")}</Notice>
+                        <ButtonLink to={NET_ROUTES.account} variant="secondary" className="w-full">{t("nav.account")}</ButtonLink>
+                      </div>
+                    )}
+                    <Button type="submit" size="lg" className="w-full" disabled={busy || needsSignIn}>{t("net.checkout.pay")}</Button>
                   </form>
                 )}
               </GlassCard>

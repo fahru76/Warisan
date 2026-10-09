@@ -47,11 +47,11 @@ export function BentoCell({ cols = 1, rows = 1, tone = "glass", flush = false, c
   );
 }
 
-export function SectionHeading({ eyebrow, title, subtitle, align = "left" }: { eyebrow?: ReactNode; title: ReactNode; subtitle?: ReactNode; align?: "left" | "center" }) {
+export function SectionHeading({ eyebrow, title, subtitle, align = "left", as: Heading = "h2" }: { eyebrow?: ReactNode; title: ReactNode; subtitle?: ReactNode; align?: "left" | "center"; as?: "h1" | "h2" }) {
   return (
     <header className={cn("mb-10 max-w-2xl", align === "center" && "mx-auto text-center")}>
       {eyebrow && <p className="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-accent">{eyebrow}</p>}
-      <h2 className="font-display text-3xl leading-tight text-ink sm:text-4xl">{title}</h2>
+      <Heading className="font-display text-3xl leading-tight text-ink sm:text-4xl">{title}</Heading>
       {subtitle && <p className="mt-3 text-base leading-relaxed text-muted sm:text-lg">{subtitle}</p>}
     </header>
   );

@@ -226,3 +226,53 @@ Required before Phase 5 checkout/auth preview:
    - `VITE_SUPABASE_ANON_KEY`
 
 The Supabase project URL is known, but no frontend deployment environment was inspected or modified. No secret values were committed.
+
+## Claude Phase 5 — Warisan.net commerce UI (2026-10-09)
+Product-owner decisions:
+- Phase 5 approved.
+- Production domain is **warisan.net**.
+- Hosting is **not decided yet**. There is no Warisan project in the connected Vercel team.
+
+### Frontend foundation changed: please read
+The frontend on `main` (and on this branch before today) **did not compile**:
+- `packages/ui/src/index.ts` contained JSX;
+- `apps/org/src/main.tsx` had broken JSX;
+- `apps/net/src/main.tsx` had two root elements.
+
+`validate.yml` only checks that files exist, so CI stayed green. I merged the earlier Claude frontend branch `claude/new-session-b00fhf`, which typechecks, passes its evals and builds both apps:
+- Its `apps/` and `packages/ui` replace the broken ones.
+- Five orphaned files were removed: `packages/ui/src/{PrivacyBanner,PrivacyControls}.tsx`, `packages/ui/src/i18n.ts`, `packages/ui/src/styles.css` and `apps/org/src/data.ts`.
+- `scripts/validate-workspace.mjs` now lists the new structure.
+- All backend, security and payment work is unchanged.
+
+The bilingual/PDPA features from Hermes's `main` commits already exist in the merged UI (EN/BM i18n, `CookieBanner`, `PdpaConsent`, `LanguageSwitcher`, legal pages). The `feat/org-bilingual-privacy` branch is superseded by this; please do not merge it on top.
+
+### Wired to the live contracts
+- **Checkout:** sign-in is required in live mode. It calls `create_order` (no prices), then `create-payment-intent` with `{orderId}` and `Idempotency-Key`. The amount shown comes from the server.
+- **Account:** order history (`listMyOrders`, RLS-scoped), with EN/BM labels for all 7 order statuses.
+- **Workshop booking:** `api.requestBooking` maps the capacity trigger error, the duplicate-booking error (23505) and the RLS error (42501) to friendly EN/BM messages.
+- **Accessibility:** `/workshops`, `/account` and the org directory now have an `<h1>`.
+
+### New migration: needs live apply
+`supabase/migrations/20261009000700_server_trusted_pdpa_consent.sql` closes H-11 and the consent part of H-7. Before it, **signup PDPA consent was never stored**, because `handle_new_user` ignored the metadata. Tests S1–S6 and B1–B2 pass in a rolled-back transaction; see `evals/security-hardening.md`.
+
+### Verification (Claude sandbox)
+- `pnpm test` 76/76, including 12 new tests in `evals/checkout-contract.test.ts`.
+- `pnpm -r typecheck` 3/3 and `pnpm -r build` 2/2.
+- Payment handler tests: Deno 10/10.
+- Headless Chromium smoke test at 390px and 1440px in demo mode:
+  - all pages render, with no horizontal overflow;
+  - demo checkout and booking complete;
+  - no JS errors; the only console errors are placeholder images, which the sandbox proxy blocks.
+- **Not verified:** a live browser run against Supabase. This sandbox cannot reach `*.supabase.co`.
+
+### Required next steps for Hermes
+1. Apply `20261009000700_server_trusted_pdpa_consent.sql` to `wkreaniwmbditbshksja`. Then re-run `supabase/tests/pdpa_consent.sql`, `authz_inventory_bookings.sql` and `authz_orders.sql`.
+   - `authz_inventory_bookings.sql` already sends consent on every booking insert, so T27–T33 keep testing status, visibility and capacity after 000700. Expected results are unchanged.
+2. **Extend CI.** Add a job to `validate.yml` that runs `pnpm install --frozen-lockfile`, `pnpm -r run typecheck`, `pnpm test` and `pnpm -r run build`, so a non-compiling frontend can never pass CI again.
+3. **Live smoke test.** From a machine that can reach Supabase, put `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in root `.env.local` (gitignored). Then sign up, confirm the email, check out one item, and book a workshop.
+4. **Hosting.** When the product owner picks a host:
+   - Supabase Auth Site URL: `https://warisan.net`;
+   - redirect allow-list: `https://warisan.net/**`, `https://www.warisan.net/**`, the host's preview pattern, and `http://localhost:5173/**` plus `http://localhost:5174/**` for dev (org and net dev ports);
+   - set the env names on the host.
+5. **Open tickets (Hermes):** H-5 timezone, H-9 image columns, H-10 CORS allow-list (set it to the warisan.net origins once hosting is known), and H-15 deterministic seed provenance IDs.
