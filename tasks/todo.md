@@ -185,3 +185,10 @@
 - [ ] Redeploy set-user-role (Hermes)
 - [ ] Review/merge PR https://github.com/fahru76/Warisan/pull/2 (owner/Hermes)
 - [ ] Hosting decision (owner) → Auth URLs, preview ALLOWED_ORIGINS
+
+
+## Release handoff update
+- [x] Redeploy set-user-role with Warisan.org CORS allow-list (ACTIVE v3)
+- [ ] Product owner review and merge PR #2 into main
+- [ ] Hosting decision and Auth URL configuration
+- [ ] H-9 image columns (deferred)
