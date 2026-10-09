@@ -276,3 +276,11 @@ The bilingual/PDPA features from Hermes's `main` commits already exist in the me
    - redirect allow-list: `https://warisan.net/**`, `https://www.warisan.net/**`, the host's preview pattern, and `http://localhost:5173/**` plus `http://localhost:5174/**` for dev (org and net dev ports);
    - set the env names on the host.
 5. **Open tickets (Hermes):** H-5 timezone, H-9 image columns, H-10 CORS allow-list (set it to the warisan.net origins once hosting is known), and H-15 deterministic seed provenance IDs.
+
+
+## Phase 5 PDPA and CI follow-up — 2026-10-09
+- Applied `supabase/migrations/20261009000700_server_trusted_pdpa_consent.sql` live.
+- Ran `supabase/tests/pdpa_consent.sql`: S1–S6 and B1–B2 matched expected results; HTTP 400 is intentional `QA_ROLLBACK`.
+- Re-ran `authz_inventory_bookings.sql` and `authz_orders.sql`: T19–T33 and O1–O17 matched expected tables; both rolled back and live counts remain 0.
+- Updated `validate.yml` to run frozen install, workspace validation, typecheck, test, and build.
+- Auth URL configuration remains unchanged until hosting/preview URLs are selected.
