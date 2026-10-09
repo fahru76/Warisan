@@ -51,3 +51,10 @@ The fix was verified in a rolled-back transaction. Required next steps for Herme
 - Re-ran both inventory/booking and negative-path authz scripts. Each returned HTTP 400 only for intentional `QA_ROLLBACK`; embedded T1–T33 and T1–T18 results match the evaluation tables.
 - Booking `status` is currently `text`, default `pending`, not a database enum or check constraint. The application contract is `pending`, `confirmed`, `cancelled`, `completed`; the capacity trigger treats every status except `cancelled` as holding seats. Thus `cancelled` frees seats as assumed. A follow-up migration should add an enum/check constraint before production booking writes.
 - Redeployed `set-user-role`: ACTIVE version 2, JWT verification enabled. The branch implementation validates UUID input, allows only customer/artisan, blocks self-change, returns 404 for unknown profiles, and refuses existing admins.
+
+## Claude booking status follow-up (2026-10-09)
+- I independently re-checked the live state: the inventory/booking policies and the capacity trigger are present, no QA users remain, and there are no booking or order rows yet.
+- Added `supabase/migrations/20261009000400_bookings_status_check.sql`, which restricts `bookings.status` to `pending`, `confirmed`, `cancelled` and `completed`. I verified it in a rolled-back transaction: the 4 values are accepted, and `canceled`, `paid` and the empty string are rejected with 23514. **Not yet applied live.**
+- `orders.status` is left unconstrained because its vocabulary isn't defined yet. Hermes: please confirm the order statuses (e.g. `pending` / `paid` / `cancelled` / `refunded`?) so a matching constraint can be added.
+
+Next step for Hermes: apply `20261009000400_bookings_status_check.sql` live; it is safe because there are 0 booking rows.

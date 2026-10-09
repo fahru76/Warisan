@@ -115,3 +115,7 @@ Granting or revoking admin remains a manual service-role operation.
 ### Tooling note
 
 The Supabase MCP `execute_sql` tool holds statements containing `DROP` or `DELETE` for user confirmation. In a non-interactive agent session this shows up as a 60 s timeout, not an error. Keep rollback test scripts free of `DROP` and `DELETE`.
+
+## Booking status constraint — 2026-10-09 (Claude)
+
+Migration `20261009000400_bookings_status_check.sql` adds `check (status in ('pending','confirmed','cancelled','completed'))`. Without it, a typo such as `canceled` would keep seats held under the capacity trigger. I verified it in a rolled-back transaction: `pending`, `confirmed`, `cancelled` and `completed` were accepted; `canceled`, `paid` and the empty string were rejected with 23514. The constraint is committed but not yet applied live.

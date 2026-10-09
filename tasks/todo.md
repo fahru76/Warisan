@@ -33,8 +33,11 @@
 - [x] Apply migration 20261009000100 to the live Supabase project and re-run supabase/tests/authz_negative_paths.sql (Hermes)
 - [x] Allow verified artisans to edit safe fields; add admin-only set-user-role function (Hermes)
 - [x] Cover craft_items, workshops and bookings authorization (supabase/tests/authz_inventory_bookings.sql)
-- [ ] Apply migration 20261009000300 live and re-run supabase/tests/authz_inventory_bookings.sql
-- [ ] Redeploy set-user-role with role allowlist and admin-target guard
+- [x] Apply migration 20261009000300 live and re-run supabase/tests/authz_inventory_bookings.sql (Hermes)
+- [x] Redeploy set-user-role with role allowlist and admin-target guard (Hermes, v2)
+- [x] Add bookings status check constraint (migration 20261009000400, verified in rollback)
+- [ ] Apply migration 20261009000400 live
+- [ ] Define orders.status vocabulary and add a matching check constraint
 - [ ] Cover orders/order_items creation path once the checkout Edge Function writes orders
 
 ## Phase 4: Frontend handoff
@@ -53,4 +56,4 @@
 - [x] Redeploy hardened set-user-role function
 
 ## Review
-- Authenticated negative-path tests pass with the trigger fix; the gate closes once migration 20261009000100 is applied live and the test script is re-run.
+- Authorization gate: T1–T18 (profiles/artisans) and T19–T33 (inventory/bookings) pass live after migrations 000100–000300. Open: apply 000400 (booking status check), define the orders status vocabulary, and test the orders path once checkout writes orders.
