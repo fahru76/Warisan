@@ -171,3 +171,9 @@
 - [ ] Apply 20261009000800 live (Hermes)
 - [ ] Redeploy create-payment-intent with the allow-list (Hermes)
 - [ ] Same allow-list for set-user-role once the Warisan.org domain is confirmed (Hermes)
+
+
+## H-5 / H-10 execution
+- [x] Apply Kuala Lumpur timezone migration live
+- [x] Redeploy create-payment-intent with Warisan.net and dev origin allow-list
+- [ ] Confirm Warisan.org domain and redeploy set-user-role with matching CORS allow-list
