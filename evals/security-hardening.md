@@ -214,3 +214,8 @@ The migration is committed but **not yet applied live**.
 Applied `20261009000700_server_trusted_pdpa_consent.sql`. `pdpa_consent.sql` returned intentional HTTP 400 `QA_ROLLBACK`; S1–S6 and B1–B2 matched the expected contract. `authz_inventory_bookings.sql` T19–T33 and `authz_orders.sql` O1–O17 also matched; all temporary rows rolled back.
 
 The migration records signup consent with server time, never client time; ignores metadata role injection; creates only unverified artisan applications with required craft/location; and requires booking consent.
+
+
+## Phase 5 execution verification — 2026-10-09
+
+Live PDPA migration and all three rolled-back test suites were applied/run. The validation workflow run `37892163405` passed install, validation, typecheck, test, and build. Live shop smoke assets were added; the smoke workflow remains a manual dispatch because no hosting provider is selected yet.
