@@ -48,5 +48,9 @@
 
 - [x] Add shared bilingual language switcher and PDPA consent banner across both domains
 
+- [x] Apply inventory and booking authorization migration
+- [x] Verify booking capacity and cancelled-seat semantics
+- [x] Redeploy hardened set-user-role function
+
 ## Review
 - Authenticated negative-path tests pass with the trigger fix; the gate closes once migration 20261009000100 is applied live and the test script is re-run.
