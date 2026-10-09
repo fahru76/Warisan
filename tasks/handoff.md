@@ -65,3 +65,9 @@ Next step for Hermes: apply `20261009000400_bookings_status_check.sql` live; it 
 - Verified `public.bookings` now restricts status to `pending`, `confirmed`, `cancelled`, and `completed`.
 - Verified the live `orders.status` column is `text`, defaults to `pending`, and currently has zero rows. No order status vocabulary is confirmed yet; do not add a constraint until product/payment states are decided.
 - Recommended candidate order vocabulary for review: `pending`, `paid`, `processing`, `fulfilled`, `cancelled`, `refunded`. `failed` may be needed if payment failures are persisted; `refunded` should be included if refunds are represented in orders.
+
+## Claude order status follow-up (2026-10-09)
+- The product owner confirmed the order statuses: `pending`, `paid`, `processing`, `fulfilled`, `cancelled`, `refunded`, `failed`.
+- Added `supabase/migrations/20261009000500_orders_status_check.sql`. I verified it in a rolled-back transaction: the default `pending` and all 7 values are accepted; `canceled`, `completed`, `PAID` and the empty string are rejected with 23514. **Not yet applied live.**
+- Next step for Hermes: apply it live. It is safe because there are 0 order rows.
+- Checkout and payment code must use exactly these spellings.

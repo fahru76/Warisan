@@ -119,3 +119,7 @@ The Supabase MCP `execute_sql` tool holds statements containing `DROP` or `DELET
 ## Booking status constraint — 2026-10-09 (Claude)
 
 Migration `20261009000400_bookings_status_check.sql` adds `check (status in ('pending','confirmed','cancelled','completed'))`. Without it, a typo such as `canceled` would keep seats held under the capacity trigger. I verified it in a rolled-back transaction: `pending`, `confirmed`, `cancelled` and `completed` were accepted; `canceled`, `paid` and the empty string were rejected with 23514. The constraint is committed but not yet applied live.
+
+## Order status constraint — 2026-10-09 (Claude)
+
+The product owner confirmed the order statuses: `pending`, `paid`, `processing`, `fulfilled`, `cancelled`, `refunded`, `failed`. Migration `20261009000500_orders_status_check.sql` adds the matching check constraint. I verified it in a rolled-back transaction: the default `pending` and all 7 values were accepted; `canceled`, `completed`, `PAID` and the empty string were rejected with 23514. The constraint is committed but not yet applied live.
