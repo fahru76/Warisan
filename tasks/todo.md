@@ -77,3 +77,10 @@
 - [ ] Cart and checkout: create_order, then create-payment-intent (test mode)
 - [ ] Customer order history (RLS-scoped)
 - [ ] Workshop listing and pending booking flow
+
+
+## Phase 5: Warisan.net commerce UI
+- [ ] Confirm production and preview URLs before changing Supabase Auth URL settings
+- [ ] Configure Supabase email confirmation and redirect allow-list
+- [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` by name in apps/net preview environment
+- [ ] Build customer auth, catalog, cart, checkout, order history, and workshop booking UI
