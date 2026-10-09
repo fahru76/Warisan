@@ -95,7 +95,7 @@
 - [x] Provenance page: "Maker not verified" state; never shows "authentic" for unverified makers
 - [x] `pnpm test` 64/64, typecheck 3/3, build 2/2
 - [x] Live check as `anon` via SQL: verified join returns 10/10 items, 3/3 workshops (no regression)
-- [ ] Not verified: PostgREST `!inner` embed syntax against live REST (sandbox egress blocks *.supabase.co) — check on first `.env.local` run
+- [x] PostgREST `!inner` embed verified against live REST (live smoke run 37918314667)
 
 - Authorization gate: T1–T18 (profiles/artisans), T19–T33 (inventory/bookings) pass live; booking and order status constraints (000400, 000500) are live.
 - Order path: create_order (000600) is live, O1–O17 pass; payment intent reads the amount from the caller's pending order (P1–P10, CI green). Backend authorization gate: COMPLETE for current scope.
@@ -117,7 +117,7 @@
 - [x] Workshop booking via `api.requestBooking`: consent required + server-stamped (000700, B1–B2), friendly capacity/duplicate/unavailable errors
 - [x] Evals: `evals/checkout-contract.test.ts` (12 tests; 76/76 total), typecheck 3/3, build 2/2
 - [ ] Apply migration 20261009000700 live and re-run `supabase/tests/pdpa_consent.sql` (Hermes)
-- [ ] Live browser smoke test against Supabase (blocked in Claude's sandbox: *.supabase.co egress denied) — run from a machine/preview with `VITE_SUPABASE_*` set
+- [x] Live browser smoke test against Supabase (GitHub Actions run 37918314667: catalogue, detail, checkout sign-in gate, workshops; no JS errors)
 - [ ] Open tickets still relevant: H-5 timezone, H-8 get_provenance (optional), H-9 image columns, H-10 CORS allow-list for warisan.net, H-15 deterministic seed provenance ids
 - [ ] Hosting decision → Supabase Site URL `https://warisan.net` + redirect allow-list (Hermes)
 - [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` by name in the apps/net preview environment (Hermes)
@@ -127,7 +127,7 @@
 - [x] Apply server-trusted PDPA consent migration
 - [x] Re-run PDPA, inventory/booking, and order authorization tests
 - [x] Extend CI with install, typecheck, test, and build gates
-- [ ] Run full CI and fix any frontend compile/test failures
+- [x] Run full CI and fix any frontend compile/test failures (validate run 37892163405 green; Claude re-checked 2026-10-09)
 - [ ] Set Auth Site URL and redirect URLs after hosting is chosen
 - [ ] Configure apps/net preview variables by name
 
@@ -137,5 +137,11 @@
 - [x] CI runs install, typecheck, test, and build
 - [x] Configure preview variable names as GitHub Actions secrets
 - [x] Add live Warisan.net smoke workflow
-- [ ] Run live-shop-smoke workflow after preview workflow is manually dispatched
+- [x] Live-shop-smoke now also runs on pushes touching the shop (dispatch 404s until the workflow is on main); extended to detail, checkout sign-in gate, workshops, no demo fallback
 - [ ] Set Auth Site URL and redirect URLs after hosting is chosen
+
+## Next (after Phase 5 live smoke)
+- [ ] Product owner: choose hosting provider → Hermes sets Auth Site URL `https://warisan.net` + redirect allow-list + host env names
+- [ ] Product owner: approve PR `claude/ecstatic-franklin-5j4zw0` → `main` (main's frontend does not compile)
+- [ ] Authenticated E2E (sign-up + email confirm, checkout, booking) with a Hermes-provisioned test user and cleanup
+- [ ] Bump GitHub Actions off deprecated Node 20 runtime

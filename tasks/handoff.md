@@ -293,3 +293,21 @@ The bilingual/PDPA features from Hermes's `main` commits already exist in the me
 - Added GitHub Actions secrets by name: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Values are not recorded in Markdown or source.
 - Added manual `live-shop-smoke.yml` and `scripts/live-shop-smoke.py` to build Warisan.net, query the live published catalogue, render the built app in Chromium, and fail on page errors.
 - Auth settings remain: email confirmation ON, Site URL `http://localhost:3000`; production is `https://warisan.net`, but preview hosting is not selected. Do not change Auth URLs until a hosting provider/preview URL is confirmed.
+
+## Claude follow-up: live shop smoke (2026-10-09)
+- Reviewed Hermes's CI and smoke changes. `validate.yml` now gates install, validate, typecheck, test and build, and its earlier run 37892163405 was green.
+- `workflow_dispatch` for `live-shop-smoke.yml` returned **404** from the GitHub API. Dispatch only works once the workflow file is on the default branch, and it is only on this branch. I added a `push` trigger scoped to shop paths (`apps/net/**`, `packages/ui/**`, the script and the workflow) so it runs from this branch now. It is read-only against live Supabase: it never signs in or writes.
+- I extended `scripts/live-shop-smoke.py`. It now:
+  - asserts that **every** live published item renders on the home page, which proves the `artisans!inner` verified join works through live PostgREST (the open item from Phase 3.1);
+  - fails if any page falls back to demo data;
+  - checks that the craft detail and `/workshops` pages render;
+  - checks that checkout tells an anonymous visitor to sign in and keeps "Pay with FPX" disabled.
+- **Result:** Live shop smoke run **37918314667 passed**. Anon sees 10 craft items and 3 workshops, all 10 render on the home page, detail, checkout gate and workshops all pass, and there were no JS errors. Validate CI run **37918346730 passed** on the same commit (`f7206b9`): install, validate, typecheck, test, build.
+- With this, the Phase 3.1 open item ("PostgREST `!inner` embed syntax against live REST") is **verified**.
+
+### Still open
+- **Product owner:** choose hosting (Vercel, Netlify or Cloudflare Pages). Then Hermes sets the Auth Site URL `https://warisan.net` and the redirect allow-list, plus the env names on the host.
+- **Merge to `main`:** this branch carries all the backend hardening and the working frontend, while `main` still has the frontend that doesn't compile. Opening a PR from `claude/ecstatic-franklin-5j4zw0` to `main` needs product-owner approval. Once merged, `workflow_dispatch` for `live-shop-smoke.yml` also works.
+- **Authenticated end-to-end run:** sign-up with email confirmation, then checkout and booking. This needs a real inbox or a test user created by Hermes, plus cleanup afterwards, so it is left to Hermes or a manual pass after hosting.
+- **Tickets for Hermes:** H-5 timezone, H-9 image columns, H-10 CORS allow-list (once hosting is known), H-15 deterministic seed provenance IDs.
+- **Minor:** GitHub warns that the actions in all workflows target the deprecated Node 20 runtime. Bump `actions/checkout`, `actions/setup-node`, `actions/setup-python` and `pnpm/action-setup` when convenient.
