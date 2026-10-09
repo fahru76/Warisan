@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
-export { CookieConsent, LanguageSwitcher, useLocale, translate } from './PrivacyControls';
+export { LanguageSwitcher, PrivacyBanner } from './PrivacyBanner';
+export { useLocale, translations } from './i18n';
 export type { Locale, TranslationKey } from './i18n';
 export function BrandMark({ domain }: { domain: 'org' | 'net' }) { return <a href="/" aria-label={`Warisan.${domain} home`} className="brand-mark"><span aria-hidden="true">◇</span><span>WARISAN</span><small>.{domain}</small></a>; }
 export function Button({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { children: ReactNode }) { return <button {...props} className={`button ${props.className ?? ''}`}>{children}</button>; }
