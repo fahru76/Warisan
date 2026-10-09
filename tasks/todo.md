@@ -31,10 +31,10 @@
 - [ ] Run authenticated negative-path tests with customer and artisan accounts
 
 ## Phase 4: Frontend handoff
-- [ ] Build shared UI package
-- [ ] Build Warisan.org trust-layer application
-- [ ] Build Warisan.net commerce-layer application
-- [ ] Integrate Supabase auth and data contracts
+- [x] Build shared UI package
+- [x] Scaffold Warisan.org trust-layer application
+- [x] Scaffold Warisan.net commerce-layer application
+- [x] Add shared Supabase data contracts and auth boundaries
 
 ## Review
 - Live backend exists, but authenticated negative-path tests remain before calling the security gate complete.
