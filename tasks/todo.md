@@ -58,3 +58,7 @@
 
 ## Review
 - Authorization gate: T1–T18 (profiles/artisans) and T19–T33 (inventory/bookings) pass live after migrations 000100–000300. Migration 000400 (booking status check) is live. Order status vocabulary decided (migration 000500, pending live apply), and test the orders path once checkout writes orders.
+
+
+- [x] Apply and verify orders status constraint
+- [ ] Run authenticated order permission tests after checkout creates orders
