@@ -1,3 +1,5 @@
 # Warisan.net
 
-Commerce layer for customer workshops, verified crafts, bookings, and test-mode checkout.
+Commerce layer for verified craft purchases, artisan workshops, customer bookings, and test-mode FPX checkout.
+
+`pnpm dev:net` → http://localhost:5174

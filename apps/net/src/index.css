@@ -1,0 +1,28 @@
+@import "tailwindcss";
+@source "../../../packages/ui/src";
+
+/* Warisan.net — warm, commercial: soft Songket gold, terracotta, charcoal. */
+@theme {
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-brand: #8a6420;
+  --color-brand-strong: #6f5019;
+  --color-accent: #b5532f;
+  --color-on-brand: #ffffff;
+  --color-ink: #2a2522;
+  --color-muted: #5f564f;
+  --color-canvas: #faf6ef;
+  --color-surface: #fffdf9;
+  --color-line: #eadfcd;
+  --color-gold-soft: #e9d3a1;
+}
+
+@layer base {
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+    background-image:
+      radial-gradient(60rem 30rem at 90% -10%, rgb(201 160 82 / 0.16), transparent 60%),
+      radial-gradient(40rem 24rem at -10% 30%, rgb(181 83 47 / 0.08), transparent 60%);
+    background-attachment: fixed;
+  }
+}

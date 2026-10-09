@@ -1,17 +1,33 @@
 # Warisan
 
-Dual-domain Malaysian heritage ecosystem:
+Dual-domain Malaysian heritage ecosystem on one Supabase project:
 
-- **Warisan.org** — provenance registry, cultural archive, and verified artisan directory.
-- **Warisan.net** — workshops, verified craft commerce, and customer bookings.
+- **Warisan.org** (`apps/org`) — provenance registry, cultural archive, verified Adiguru Kraf directory, artisan registration, admin.
+- **Warisan.net** (`apps/net`) — verified craft marketplace, workshop booking, test-mode FPX checkout.
+- **`packages/ui`** — shared components, EN/BM i18n, data layer, legal boilerplate, payment service layer.
 
-## Workspace policy
+## Quick start (local machine, repo root)
 
-GitHub is the canonical workspace. Changes are made through GitHub-native operations and verified through GitHub Actions. Secrets are never committed.
+```bash
+pnpm install
+cp .env.example .env.local   # optional: fill VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY for live data
+pnpm dev:org                 # http://localhost:5173
+pnpm dev:net                 # http://localhost:5174
+```
 
-## Development order
+Without Supabase env vars both apps run on bundled fixture data and show a "demo data" notice.
 
-1. Backend contract and Supabase migrations.
-2. RLS and seed verification.
-3. Shared UI package.
-4. Domain applications.
+## Checks
+
+```bash
+pnpm test        # evals/*.test.ts(x)
+pnpm typecheck
+pnpm build
+pnpm validate
+```
+
+## Workspace protocol
+
+- `tasks/todo.md` — plan + progress, `tasks/lessons.md` — corrections, `tasks/handoff.md` — Claude ⇄ Hermes tickets.
+- `evals/` — success criteria written before code.
+- Secrets never committed; only `VITE_`-prefixed public keys reach browser code.

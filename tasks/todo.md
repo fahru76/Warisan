@@ -59,6 +59,44 @@
 - [x] Redeploy hardened set-user-role function
 
 ## Review
+- GitHub-only execution adopted.
+- Backend schema, seed, RLS, auth trigger, and test payment contract are present remotely.
+
+## Phase 3: Frontend foundation (Claude Agent)
+- [x] Write frontend evals before code (`evals/frontend-foundation.md`, `evals/*.test.ts`)
+- [x] Root toolchain: Turborepo scripts, Vitest, shared TS config
+- [x] `packages/ui`: brand mark, bento/glass primitives, ratio-locked `SmartImage`, PDPA checkbox, cookie banner, language switcher, legal pages
+- [x] `packages/ui`: i18n (EN/BM) with protected cultural terms, language-aware OG tags
+- [x] `packages/ui`: Supabase client + data layer with fixture fallback, MYR + `Asia/Kuala_Lumpur` formatters, provenance URL builder
+- [x] `apps/org`: Vite + React + Tailwind, emerald/slate theme, registry, artisan profile, provenance lookup, artisan registration, mobile-first admin, legal routes
+- [x] `apps/net`: Vite + React + Tailwind, gold/terracotta/charcoal theme, marketplace, craft detail, workshops, booking, test-mode checkout, legal routes
+- [x] Evals green, both apps typecheck + build
+- [x] File backend tickets in `tasks/handoff.md`
+
+## Phase 3 review (Claude Agent, 2026-10-07)
+- Evals: `pnpm test` → 57/57 pass (5 cross-domain consistency suites + PDPA/image/currency guardrails).
+- `pnpm typecheck` (3 packages) and `pnpm build` (org + net) pass.
+- Headless Chromium smoke (11 pages, desktop 1440 + mobile 390, host TZ America/New_York): no JS errors, no horizontal scroll, PDPA boxes unchecked, BM auto-detected from `ms-MY` locale with `og:locale=ms_MY`.
+- Not verified here: live Supabase reads/writes (no `VITE_SUPABASE_*` in this sandbox) and placeholder images (picsum.photos blocked by sandbox proxy).
+- Known debt: ~650 kB JS bundle per app (code-split on Day 6); SPA OG tags need prerender for social crawlers.
+
+## Phase 4: Next (frontend)
+- [ ] Wire live env (`.env.local` with `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) and smoke-test against project `wkreaniwmbditbshksja`
+- [ ] Swap booking insert → `book_workshop` RPC (H-7) and checkout draft id → `create_order` RPC (H-6)
+- [ ] QR code render + print view on `/provenance/:id`
+- [ ] Route-level code splitting; prerender OG tags
+- [ ] Replace placeholder logo with final SVG when supplied
+
+## Phase 3.1: H-12 frontend trust gate (Claude Agent, 2026-10-07)
+- [x] Verify Hermes P0 remediation in git + live (H-1..H-4 closed)
+- [x] File H-12..H-15 in `tasks/handoff.md`
+- [x] Eval first: `evals/trust.test.ts` (failed 6/7 before fix)
+- [x] Data layer: listings/detail require a verified maker (`artisans!inner` join live, same rule on fixtures); `getArtisan` public lookup verified-only
+- [x] Provenance page: "Maker not verified" state; never shows "authentic" for unverified makers
+- [x] `pnpm test` 64/64, typecheck 3/3, build 2/2
+- [x] Live check as `anon` via SQL: verified join returns 10/10 items, 3/3 workshops (no regression)
+- [ ] Not verified: PostgREST `!inner` embed syntax against live REST (sandbox egress blocks *.supabase.co) — check on first `.env.local` run
+
 - Authorization gate: T1–T18 (profiles/artisans), T19–T33 (inventory/bookings) pass live; booking and order status constraints (000400, 000500) are live.
 - Order path: create_order (000600) is live, O1–O17 pass; payment intent reads the amount from the caller's pending order (P1–P10, CI green). Backend authorization gate: COMPLETE for current scope.
 
@@ -71,16 +109,12 @@
 - [x] Verify payment-intent hardening: P1–P10 pass locally (Claude) and in CI run 37889240049
 - [x] Align @warisan/supabase-types with live contract (Order/OrderItem/Booking, status unions, CreateOrderArgs; amountMyr removed from payment input)
 
-## Phase 5: Warisan.net commerce UI (proposed, awaiting go-ahead)
+## Phase 5: Warisan.net commerce UI (approved 2026-10-09; production domain warisan.net; hosting TBD)
+- [x] Adopt the working frontend from `claude/new-session-b00fhf` (the frontend on main did not compile)
+- [ ] Wire checkout to live `create_order` RPC + hardened `create-payment-intent` (orderId only)
 - [ ] Customer sign-in/sign-up (Supabase Auth) with PDPA consent capture
-- [ ] Catalog of published items from verified artisans
-- [ ] Cart and checkout: create_order, then create-payment-intent (test mode)
+- [ ] Catalog of published items from verified artisans (live smoke test)
 - [ ] Customer order history (RLS-scoped)
-- [ ] Workshop listing and pending booking flow
-
-
-## Phase 5: Warisan.net commerce UI
-- [ ] Confirm production and preview URLs before changing Supabase Auth URL settings
-- [ ] Configure Supabase email confirmation and redirect allow-list
-- [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` by name in apps/net preview environment
-- [ ] Build customer auth, catalog, cart, checkout, order history, and workshop booking UI
+- [ ] Workshop listing and pending booking flow (matches live bookings_insert_own policy + capacity trigger)
+- [ ] Hosting decision → Supabase Site URL `https://warisan.net` + redirect allow-list (Hermes)
+- [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` by name in the apps/net preview environment (Hermes)

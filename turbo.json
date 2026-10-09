@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["VITE_SUPABASE_URL", "VITE_SUPABASE_ANON_KEY", "VITE_ORG_ORIGIN", "VITE_NET_ORIGIN"],
   "tasks": {
     "typecheck": {
       "dependsOn": ["^typecheck"],
@@ -7,7 +8,11 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "build/**"]
+      "outputs": ["dist/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
     }
   }
 }
