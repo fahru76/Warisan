@@ -130,3 +130,12 @@
 - [ ] Run full CI and fix any frontend compile/test failures
 - [ ] Set Auth Site URL and redirect URLs after hosting is chosen
 - [ ] Configure apps/net preview variables by name
+
+
+## Phase 5 execution update
+- [x] Apply server-trusted PDPA migration and rerun consent/authz tests
+- [x] CI runs install, typecheck, test, and build
+- [x] Configure preview variable names as GitHub Actions secrets
+- [x] Add live Warisan.net smoke workflow
+- [ ] Run live-shop-smoke workflow after preview workflow is manually dispatched
+- [ ] Set Auth Site URL and redirect URLs after hosting is chosen
