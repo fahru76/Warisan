@@ -36,5 +36,8 @@
 - [x] Scaffold Warisan.net commerce-layer application
 - [x] Add shared Supabase data contracts and auth boundaries
 
+- [x] Add provenance detail route
+- [x] Add public artisan detail route
+
 ## Review
 - Live backend exists, but authenticated negative-path tests remain before calling the security gate complete.
