@@ -377,3 +377,4 @@ Decisions:
 Change: `set-user-role` now echoes `Access-Control-Allow-Origin` only for `https://warisan.org`, `https://www.warisan.org` and the org dev/preview ports (`localhost`/`127.0.0.1` on 5173 and 4173), with the same `ALLOWED_ORIGINS` override. `payment-security.yml` now also runs `deno check` on `set-user-role` and triggers on its path.
 
 Hermes next step: **redeploy `set-user-role`**. Live it still returns `*` until then.
+- **PR opened for review:** https://github.com/fahru76/Warisan/pull/2 (`claude/ecstatic-franklin-5j4zw0` → `main`). It has no conflicts, because `main` is an ancestor of the branch. Payment security CI run 37920134009 is green, including the `set-user-role` `deno check`. Merge only after product-owner or Hermes review.
