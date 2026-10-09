@@ -30,7 +30,12 @@
 - [x] Add authorization regression evaluation
 - [x] Run authenticated negative-path tests with customer and artisan accounts (see evals/security-hardening.md)
 - [x] Fix trigger that broke every profiles/artisans UPDATE (migration 20261009000100)
-- [ ] Apply migration 20261009000100 to the live Supabase project and re-run supabase/tests/authz_negative_paths.sql
+- [x] Apply migration 20261009000100 to the live Supabase project and re-run supabase/tests/authz_negative_paths.sql (Hermes)
+- [x] Allow verified artisans to edit safe fields; add admin-only set-user-role function (Hermes)
+- [x] Cover craft_items, workshops and bookings authorization (supabase/tests/authz_inventory_bookings.sql)
+- [ ] Apply migration 20261009000300 live and re-run supabase/tests/authz_inventory_bookings.sql
+- [ ] Redeploy set-user-role with role allowlist and admin-target guard
+- [ ] Cover orders/order_items creation path once the checkout Edge Function writes orders
 
 ## Phase 4: Frontend handoff
 - [x] Build shared UI package

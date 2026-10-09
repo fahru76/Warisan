@@ -64,3 +64,54 @@ Applied `20261009000100_fix_privileged_mutation_trigger.sql` to `wkreaniwmbditbs
 Verified: T1, T1b, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18 all match expected security outcomes after the fix. T15 now allows verified owners to edit safe profile fields.
 
 Policy decision: verified artisans may edit their own profile fields, but cannot change `profile_id` or `is_verified`; the trigger remains the server-side guard. Client role changes are not allowed. Admin role changes use the JWT-protected `set-user-role` Edge Function, which verifies the caller from Auth and requires the `admin` profile role before using the service role.
+
+## Inventory and booking authorization — 2026-10-09 (Claude)
+
+This closes follow-up 3 (`craft_items` / `workshops` coverage) and extends testing to bookings. Script: `supabase/tests/authz_inventory_bookings.sql`; it rolls back like the first script.
+
+### Defects found live (before the fix)
+
+| # | Finding | Live result |
+|---|---|---|
+| T19/T23 | Unverified artisan publishes a craft item; it appears in the public provenance registry | anon sees 1 |
+| T20/T24 | Unverified artisan publishes a workshop; it appears publicly | anon sees 1 |
+| T27 | Customer inserts a booking with `status='confirmed'` (no payment) | ALLOWED |
+| T28 | Customer books an unpublished workshop | ALLOWED |
+| T29 | Customer books 99 seats on a capacity-2 workshop | ALLOWED |
+
+Fix: `supabase/migrations/20261009000300_restrict_public_inventory_and_bookings.sql`. It uses `ALTER POLICY` and `CREATE OR REPLACE TRIGGER`; no drops. **Committed; not yet applied live.**
+
+- **Public inventory:** `craft_items_public` and `workshops_public` now also require the artisan to be verified.
+- **Booking inserts:** `bookings_insert_own` requires `status='pending'` and a published, future workshop from a verified artisan.
+- **Capacity:** the new `enforce_workshop_capacity` trigger enforces capacity for all writers. It locks the workshop row to serialize concurrent bookings. Assumption: `cancelled` bookings free their seats.
+
+### Results with the fix loaded (inside the rolled-back transaction)
+
+| # | Case | Result | Expected |
+|---|---|---|---|
+| T19/T20 | Unverified owner inserts published item/workshop | allowed (own draft) | ✅ hidden until verified |
+| T21 | Owner sees own items | 1 | ✅ |
+| T23/T24 | anon sees unverified artisan items/workshops | 0 / 0 | ✅ |
+| T25 | anon sees unpublished workshop | 0 | ✅ |
+| T26 | anon sees verified artisan published item | 1 | ✅ |
+| T27 | Customer self-confirmed booking | DENIED 42501 | ✅ |
+| T28 | Customer books unpublished workshop | DENIED 42501 | ✅ |
+| T29 | Customer books qty 99 on capacity 2 | DENIED `workshop capacity exceeded` | ✅ |
+| T30 | Customer pending booking qty 1 | allowed | ✅ |
+| T31 | Second customer qty 2 with 1 seat left | DENIED `workshop capacity exceeded` | ✅ |
+| T32 | Second customer takes the last seat | allowed | ✅ |
+| T33 | Duplicate booking, full workshop | DENIED | ✅ |
+
+### `set-user-role` hardening (code only; needs redeploy)
+
+`role` was only typed, not checked at runtime, so an admin client could send `"admin"`, or any string, and the function would apply it. The function now:
+- accepts only `customer` or `artisan`, and requires `userId` to be a UUID;
+- refuses self-changes;
+- returns 404 for unknown users;
+- refuses to change an existing admin.
+
+Granting or revoking admin remains a manual service-role operation.
+
+### Tooling note
+
+The Supabase MCP `execute_sql` tool holds statements containing `DROP` or `DELETE` for user confirmation. In a non-interactive agent session this shows up as a 60 s timeout, not an error. Keep rollback test scripts free of `DROP` and `DELETE`.

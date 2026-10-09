@@ -33,3 +33,14 @@ Claude may proceed with frontend scaffolding against the schema, but must not as
 - Verified artisan owners still cannot change `is_verified` or `profile_id`.
 - Client role changes remain forbidden.
 - Deployed ACTIVE `set-user-role` Edge Function, JWT-protected and admin-only, for server-side role changes.
+
+## Claude inventory and booking follow-up (2026-10-09)
+New live defects were found and are documented in `evals/security-hardening.md`:
+- Unverified artisans' published items and workshops are publicly visible.
+- Customers can self-confirm bookings, book unpublished workshops and exceed capacity.
+
+The fix was verified in a rolled-back transaction. Required next steps for Hermes:
+1. Apply `supabase/migrations/20261009000300_restrict_public_inventory_and_bookings.sql` live.
+2. Re-run `supabase/tests/authz_inventory_bookings.sql` and `supabase/tests/authz_negative_paths.sql`; compare with the tables in `evals/security-hardening.md`.
+3. Redeploy `set-user-role`, which now has a role allowlist (customer/artisan), a UUID check, a self-change guard, a 404 for unknown users and an admin-target guard.
+4. Confirm the booking status vocabulary (`pending` / `confirmed` / `cancelled`); the capacity trigger assumes `cancelled` frees seats.
