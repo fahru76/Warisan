@@ -145,3 +145,21 @@
 - [ ] Product owner: approve PR `claude/ecstatic-franklin-5j4zw0` → `main` (main's frontend does not compile)
 - [ ] Authenticated E2E (sign-up + email confirm, checkout, booking) with a Hermes-provisioned test user and cleanup
 - [ ] Bump GitHub Actions off deprecated Node 20 runtime
+
+
+## Current release handoff — 2026-10-09
+
+- Live shop smoke run `37918314667` passed: 10 items and 3 workshops rendered; detail and workshop pages worked; anonymous checkout was gated; no JavaScript errors; verified-artisan join was confirmed live.
+- Validate CI run `37918346730` is green on commit `f7206b9`.
+- The live smoke workflow runs on pushes touching the shop because manual dispatch returned 404 until the workflow exists on `main`.
+- Do not merge `feat/org-bilingual-privacy`; the working frontend came from `claude/new-session-b00fhf` and Phase 5 work is on this branch.
+- Merge to `main` is waiting for product-owner approval.
+
+### Remaining work
+- Provision and clean up a confirmed-email test user, then run signed-in end-to-end signup/checkout/booking verification. Credentials must not be committed or sent in chat.
+- H-5 timezone: pin database/session behavior to `Asia/Kuala_Lumpur`.
+- H-9: add image columns if product accepts the schema addition.
+- H-10: restrict Edge Function CORS after hosting URLs are known.
+- H-15: make seed provenance UUIDs deterministic.
+- Update GitHub Actions action versions to remove the Node 20 deprecation warnings.
+- Set Supabase Auth Site URL and redirect allow-list after hosting is selected.
