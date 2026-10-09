@@ -12,7 +12,9 @@ const required = [
   "packages/ui/src/index.ts",
   "packages/ui/src/styles.css",
   "apps/org/src/main.tsx",
-  "apps/net/src/main.tsx"
+  "apps/net/src/main.tsx",
+  "packages/ui/src/i18n.ts",
+  "packages/ui/src/PrivacyControls.tsx"
 ];
 
 for (const path of required) {
