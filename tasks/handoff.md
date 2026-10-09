@@ -1,44 +1,23 @@
 # Agent Handoff
 
 ## Status
-Hermes backend foundation is present in GitHub.
+Hermes backend foundation and P0 authorization remediation are in GitHub and applied to the live Supabase project.
 
 ## Workspace contract
 GitHub is the only workspace. Do not clone or use a local repository.
 
 ## Backend contract
-- supabase/migrations/20261007000100_initial_schema.sql
-- supabase/migrations/20261007000200_auth_roles_and_policies.sql
-- supabase/seed.sql
-- supabase/functions/create-payment-intent/index.ts
+- `supabase/migrations/20261007000100_initial_schema.sql`
+- `supabase/migrations/20261007000200_auth_roles_and_policies.sql`
+- `supabase/migrations/20261007000300_privilege_escalation_hardening.sql`
+- `supabase/seed.sql`
+- `supabase/functions/create-payment-intent/index.ts`
 
-The backend defines profiles, artisans, craft items, workshops, bookings, orders, order items, provenance UUIDs, PDPA fields, RLS, signup profile creation, and a test-only payment intent function.
+## Security state
+Live policy hardening has been applied and inspected. Customer role mutation and self-created verified artisan paths are blocked by RLS and database triggers. Authenticated negative-path tests are still required.
 
-## Deployment blocker
-The migration and Edge Function are not deployed to a live Supabase project. Deployment requires a project ref and securely configured GitHub Actions secrets. Do not claim live deployment before a remote verification query succeeds.
+## Frontend handoff gate
+Claude may proceed with frontend scaffolding against the schema, but must not assume role changes or artisan verification are client-writable. Admin verification must use an admin-controlled path.
 
-## Frontend contract
-Claude Agent can build against the committed schema. If frontend work needs an RPC, add the request here before implementation.
-
-
-## Live Supabase verification
-- Project ref: `wkreaniwmbditbshksja`
-- Initial schema migration applied successfully through the Supabase Management API.
-- Role/auth migration initially failed because the GitHub copy contained malformed dollar-quote delimiters; corrected SQL was applied remotely and verified.
-- Seed verification currently shows 5 artisans, 1 craft item, and 1 workshop. The full 10-item/3-workshop seed was not applied; this remains incomplete.
-- Payment Edge Function has not been deployed.
-
-
-## Final live deployment verification
-- Full seed now verified: 5 artisans, 10 craft items, 3 workshops.
-- Edge Function `create-payment-intent` deployed successfully, version 1, ACTIVE, JWT verification enabled.
-- Live function smoke test returned HTTP 200 with a test-mode payment intent.
-- GitHub Actions secret setup was not used; deployment was performed through the Supabase Management API.
-
-
-## P0 security remediation
-- Confirmed corrupted control bytes in the committed role migration.
-- Repaired the migration and restored the complete seed file in GitHub.
-- Applied live hardening: client users cannot change `profiles.role`; only unverified artisan rows may be self-created; artisan verification is admin-managed.
-- Added database triggers rejecting role escalation and unauthorized verification changes.
-- Verified the hardened policy set remotely.
+## Required next backend test
+Use non-admin authenticated customer and artisan accounts to prove the denied mutation cases, then record the results in `evals/security-hardening.md`.
