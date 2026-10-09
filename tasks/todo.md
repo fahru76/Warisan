@@ -61,3 +61,10 @@
 ## Review
 - Authorization gate: T1–T18 (profiles/artisans), T19–T33 (inventory/bookings) pass live; booking and order status constraints (000400, 000500) are live.
 - Order path: create_order RPC (000600) and tests O1–O17 pass in rollback; pending live apply. Payment intent must stop trusting client-supplied amounts before real payments.
+
+
+- [x] Apply and verify create_order RPC
+- [x] Re-run O1–O17 order authorization tests
+- [x] Harden and redeploy create-payment-intent ownership/amount checks
+- [x] Add payment security regression tests and CI workflow
+- [ ] Run authenticated order permission tests after checkout creates persistent order rows
