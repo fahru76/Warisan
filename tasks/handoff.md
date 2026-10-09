@@ -311,3 +311,21 @@ The bilingual/PDPA features from Hermes's `main` commits already exist in the me
 - **Authenticated end-to-end run:** sign-up with email confirmation, then checkout and booking. This needs a real inbox or a test user created by Hermes, plus cleanup afterwards, so it is left to Hermes or a manual pass after hosting.
 - **Tickets for Hermes:** H-5 timezone, H-9 image columns, H-10 CORS allow-list (once hosting is known), H-15 deterministic seed provenance IDs.
 - **Minor:** GitHub warns that the actions in all workflows target the deprecated Node 20 runtime. Bump `actions/checkout`, `actions/setup-node`, `actions/setup-python` and `pnpm/action-setup` when convenient.
+
+
+## Current release handoff — 2026-10-09
+
+- Live shop smoke run `37918314667` passed: 10 items and 3 workshops rendered; detail and workshop pages worked; anonymous checkout was gated; no JavaScript errors; verified-artisan join was confirmed live.
+- Validate CI run `37918346730` is green on commit `f7206b9`.
+- The live smoke workflow runs on pushes touching the shop because manual dispatch returned 404 until the workflow exists on `main`.
+- Do not merge `feat/org-bilingual-privacy`; the working frontend came from `claude/new-session-b00fhf` and Phase 5 work is on this branch.
+- Merge to `main` is waiting for product-owner approval.
+
+### Remaining work
+- Provision and clean up a confirmed-email test user, then run signed-in end-to-end signup/checkout/booking verification. Credentials must not be committed or sent in chat.
+- H-5 timezone: pin database/session behavior to `Asia/Kuala_Lumpur`.
+- H-9: add image columns if product accepts the schema addition.
+- H-10: restrict Edge Function CORS after hosting URLs are known.
+- H-15: make seed provenance UUIDs deterministic.
+- Update GitHub Actions action versions to remove the Node 20 deprecation warnings.
+- Set Supabase Auth Site URL and redirect allow-list after hosting is selected.
