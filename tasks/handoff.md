@@ -284,3 +284,12 @@ The bilingual/PDPA features from Hermes's `main` commits already exist in the me
 - Re-ran `authz_inventory_bookings.sql` and `authz_orders.sql`: T19–T33 and O1–O17 matched expected tables; both rolled back and live counts remain 0.
 - Updated `validate.yml` to run frozen install, workspace validation, typecheck, test, and build.
 - Auth URL configuration remains unchanged until hosting/preview URLs are selected.
+
+
+## Phase 5 execution update — 2026-10-09
+- Applied `20261009000700_server_trusted_pdpa_consent.sql` live.
+- Re-ran `pdpa_consent.sql`, `authz_inventory_bookings.sql`, and `authz_orders.sql`; each returned intentional `QA_ROLLBACK` and all expected S/B/T/O results matched. Live order/booking/QA-user counts remain 0.
+- `validate.yml` now enforces frozen install, validation, typecheck, test, and build. GitHub run 37892163405 passed all five gates.
+- Added GitHub Actions secrets by name: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Values are not recorded in Markdown or source.
+- Added manual `live-shop-smoke.yml` and `scripts/live-shop-smoke.py` to build Warisan.net, query the live published catalogue, render the built app in Chromium, and fail on page errors.
+- Auth settings remain: email confirmation ON, Site URL `http://localhost:3000`; production is `https://warisan.net`, but preview hosting is not selected. Do not change Auth URLs until a hosting provider/preview URL is confirmed.
