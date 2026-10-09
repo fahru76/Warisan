@@ -44,3 +44,10 @@ The fix was verified in a rolled-back transaction. Required next steps for Herme
 2. Re-run `supabase/tests/authz_inventory_bookings.sql` and `supabase/tests/authz_negative_paths.sql`; compare with the tables in `evals/security-hardening.md`.
 3. Redeploy `set-user-role`, which now has a role allowlist (customer/artisan), a UUID check, a self-change guard, a 404 for unknown users and an admin-target guard.
 4. Confirm the booking status vocabulary (`pending` / `confirmed` / `cancelled`); the capacity trigger assumes `cancelled` frees seats.
+
+
+## Inventory, booking, and role-function follow-up
+- Applied `20261009000300_restrict_public_inventory_and_bookings.sql` live.
+- Re-ran both inventory/booking and negative-path authz scripts. Each returned HTTP 400 only for intentional `QA_ROLLBACK`; embedded T1–T33 and T1–T18 results match the evaluation tables.
+- Booking `status` is currently `text`, default `pending`, not a database enum or check constraint. The application contract is `pending`, `confirmed`, `cancelled`, `completed`; the capacity trigger treats every status except `cancelled` as holding seats. Thus `cancelled` frees seats as assumed. A follow-up migration should add an enum/check constraint before production booking writes.
+- Redeployed `set-user-role`: ACTIVE version 2, JWT verification enabled. The branch implementation validates UUID input, allows only customer/artisan, blocks self-change, returns 404 for unknown profiles, and refuses existing admins.
