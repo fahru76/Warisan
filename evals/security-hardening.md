@@ -207,3 +207,10 @@ Script: `supabase/tests/pdpa_consent.sql` (rolls back). The first run caught a b
 | B2 | booking without consent | DENIED 42501 ✅ |
 
 The migration is committed but **not yet applied live**.
+
+
+## PDPA consent and Phase 5 rerun — 2026-10-09
+
+Applied `20261009000700_server_trusted_pdpa_consent.sql`. `pdpa_consent.sql` returned intentional HTTP 400 `QA_ROLLBACK`; S1–S6 and B1–B2 matched the expected contract. `authz_inventory_bookings.sql` T19–T33 and `authz_orders.sql` O1–O17 also matched; all temporary rows rolled back.
+
+The migration records signup consent with server time, never client time; ignores metadata role injection; creates only unverified artisan applications with required craft/location; and requires booking consent.
