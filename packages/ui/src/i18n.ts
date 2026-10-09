@@ -1,0 +1,8 @@
+export type Locale = 'en' | 'ms';
+export const translations = {
+  en: { language: 'Language', english: 'English', bahasaMelayu: 'Bahasa Melayu', privacy: 'Privacy Policy', terms: 'Terms of Use', vendorAgreement: 'Vendor Agreement', consentTitle: 'Privacy matters', consentBody: 'We use essential cookies and process personal data to provide Warisan services. Read our Privacy Policy for details.', accept: 'Accept essential cookies', manage: 'Manage privacy', save: 'Save preferences', marketing: 'I agree to receive Warisan updates and marketing communications.', requiredConsent: 'Please accept the required privacy terms to continue.' },
+  ms: { language: 'Bahasa', english: 'English', bahasaMelayu: 'Bahasa Melayu', privacy: 'Dasar Privasi', terms: 'Terma Penggunaan', vendorAgreement: 'Perjanjian Vendor', consentTitle: 'Privasi penting', consentBody: 'Kami menggunakan kuki penting dan memproses data peribadi untuk menyediakan perkhidmatan Warisan. Baca Dasar Privasi kami untuk maklumat lanjut.', accept: 'Terima kuki penting', manage: 'Urus privasi', save: 'Simpan pilihan', marketing: 'Saya bersetuju menerima kemas kini dan komunikasi pemasaran Warisan.', requiredConsent: 'Sila terima terma privasi yang diperlukan untuk meneruskan.' },
+} as const;
+export type TranslationKey = keyof typeof translations.en;
+export function getInitialLocale(): Locale { const saved = localStorage.getItem('warisan-locale'); return saved === 'ms' ? 'ms' : 'en'; }
+export function setLocale(locale: Locale) { localStorage.setItem('warisan-locale', locale); document.documentElement.lang = locale === 'ms' ? 'ms-MY' : 'en'; }
