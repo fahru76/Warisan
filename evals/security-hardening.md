@@ -165,3 +165,12 @@ The migration is committed but not yet applied live. Afterwards the live state w
 ### Open finding: payment intent trusts the client amount
 
 `supabase/functions/create-payment-intent/index.ts` takes `orderId` and `amountMyr` from the request body. It does not check that the order exists, belongs to the caller, is `pending`, or that the amount equals `orders.total_myr`. It is test-mode only today, but it must read the amount from the caller's own order before any real payment provider is connected.
+
+
+## Payment intent authorization — 2026-10-09
+
+Finding fixed before any real provider integration: the previous function trusted browser-supplied `orderId` and `amountMyr`.
+
+The function now requires a user JWT, reads the caller's order through the caller-scoped Supabase client, returns 404 for another user's/missing order, requires `pending`, and derives `amountMyr` from `orders.total_myr`. Client-supplied amounts are ignored. Invalid UUIDs, invalid keys, zero totals, and backend failures are rejected.
+
+Added deterministic unit tests in `supabase/functions/create-payment-intent/handler_test.ts` and GitHub workflow `.github/workflows/payment-security.yml`. Live deployment is ACTIVE version 2 with JWT verification. Smoke tests: missing auth returned 401; publishable key without a user JWT returned 401.
