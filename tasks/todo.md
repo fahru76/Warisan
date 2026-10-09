@@ -39,5 +39,7 @@
 - [x] Add provenance detail route
 - [x] Add public artisan detail route
 
+- [x] Add shared bilingual language switcher and PDPA consent banner across both domains
+
 ## Review
 - Live backend exists, but authenticated negative-path tests remain before calling the security gate complete.
