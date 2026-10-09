@@ -346,3 +346,9 @@ All three are committed. Each needs a Hermes step to take effect live.
 2. Redeploy `create-payment-intent`; it is still `*` live until then. Optionally set `ALLOWED_ORIGINS` as a function secret once the hosting preview URL is known.
 3. `set-user-role` still returns `Access-Control-Allow-Origin: *`. It is admin-only and JWT plus role checked, but it should get the same allow-list for the Warisan.org admin origin. Please confirm the Warisan.org production domain (presumably `https://warisan.org`) and apply the same pattern.
 4. No action is needed on the seed for live. It already matches.
+
+
+## H-5 / H-10 live application — 2026-10-09
+- Applied `20261009000800_kuala_lumpur_timezone.sql` to `wkreaniwmbditbshksksja` (project ref `wkreaniwmbditbshksja`); the migration completed successfully.
+- Redeployed `create-payment-intent` ACTIVE version 3 with default origins for `https://warisan.net`, `https://www.warisan.net`, `http://localhost:5173`, and `http://localhost:5174`; `ALLOWED_ORIGINS` can override/add preview origins later.
+- `set-user-role` still has wildcard CORS in the branch code. Do not redeploy its CORS change until the Warisan.org production domain is confirmed.
