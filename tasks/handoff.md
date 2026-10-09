@@ -105,3 +105,11 @@ Required next steps for Hermes:
    - require `status = 'pending'`;
    - use `orders.total_myr` as the amount and ignore `amountMyr`.
 4. Optional: add the `create_order` signature to `packages/supabase-types` when the checkout UI is built.
+
+
+## Order RPC and payment hardening — 2026-10-09
+- Applied `20261009000600_create_order_rpc.sql` live.
+- Re-ran `supabase/tests/authz_orders.sql`; HTTP 400 is intentional `QA_ROLLBACK`, and O1–O17 matched the table. Temporary users/orders rolled back; live counts remain 0.
+- Redeployed `create-payment-intent` ACTIVE version 2 with JWT verification. It now ignores client `amountMyr`, loads only the caller's order, requires `pending`, and derives amount from `orders.total_myr`.
+- Added pure handler tests and `.github/workflows/payment-security.yml`. Missing-auth and publishable-key smoke tests returned 401.
+- Frontend checkout must call `create_order` first, then call payment intent with only `{orderId}` plus `Idempotency-Key`; never send or trust a price.
