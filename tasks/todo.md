@@ -28,7 +28,9 @@
 - [x] Prevent self-created verified artisans
 - [x] Add server-side privilege mutation triggers
 - [x] Add authorization regression evaluation
-- [ ] Run authenticated negative-path tests with customer and artisan accounts
+- [x] Run authenticated negative-path tests with customer and artisan accounts (see evals/security-hardening.md)
+- [x] Fix trigger that broke every profiles/artisans UPDATE (migration 20261009000100)
+- [ ] Apply migration 20261009000100 to the live Supabase project and re-run supabase/tests/authz_negative_paths.sql
 
 ## Phase 4: Frontend handoff
 - [x] Build shared UI package
@@ -42,4 +44,4 @@
 - [x] Add shared bilingual language switcher and PDPA consent banner across both domains
 
 ## Review
-- Live backend exists, but authenticated negative-path tests remain before calling the security gate complete.
+- Authenticated negative-path tests pass with the trigger fix; the gate closes once migration 20261009000100 is applied live and the test script is re-run.
