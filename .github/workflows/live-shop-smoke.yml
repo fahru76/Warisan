@@ -1,6 +1,14 @@
 name: Live shop smoke
 on:
   workflow_dispatch:
+  # workflow_dispatch only works once this file is on the default branch, so also run on
+  # pushes that touch the shop. Read-only against live Supabase; never signs in or writes.
+  push:
+    paths:
+      - 'apps/net/**'
+      - 'packages/ui/**'
+      - 'scripts/live-shop-smoke.py'
+      - '.github/workflows/live-shop-smoke.yml'
 permissions:
   contents: read
 jobs:
