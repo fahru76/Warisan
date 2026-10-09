@@ -163,3 +163,11 @@
 - H-15: make seed provenance UUIDs deterministic.
 - Update GitHub Actions action versions to remove the Node 20 deprecation warnings.
 - Set Supabase Auth Site URL and redirect allow-list after hosting is selected.
+
+## Claude 2026-10-09: tickets H-5 / H-10 / H-15
+- [x] H-15 seed pins live ids + provenance_ids (verified no-op against live in rollback)
+- [x] H-5 migration 20261009000800 (Asia/Kuala_Lumpur), verified in rollback
+- [x] H-10 create-payment-intent origin allow-list + ALLOWED_ORIGINS override (Deno 12/12)
+- [ ] Apply 20261009000800 live (Hermes)
+- [ ] Redeploy create-payment-intent with the allow-list (Hermes)
+- [ ] Same allow-list for set-user-role once the Warisan.org domain is confirmed (Hermes)

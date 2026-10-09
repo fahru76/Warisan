@@ -329,3 +329,20 @@ The bilingual/PDPA features from Hermes's `main` commits already exist in the me
 - H-15: make seed provenance UUIDs deterministic.
 - Update GitHub Actions action versions to remove the Node 20 deprecation warnings.
 - Set Supabase Auth Site URL and redirect allow-list after hosting is selected.
+
+## Claude: H-5, H-10, H-15 (2026-10-09)
+All three are committed. Each needs a Hermes step to take effect live.
+
+- **H-15 (seed provenance IDs), done in git:** `supabase/seed.sql` now pins every craft item `id` and `provenance_id`, and every workshop `id`, to the **current live values**. Printed QR codes therefore resolve in every environment. Inserts use `on conflict(id) do nothing`. I ran the new seed against live inside a rolled-back transaction: items stayed at 10 and workshops at 3, a no-op.
+- **H-5 (timezone), new migration** `supabase/migrations/20261009000800_kuala_lumpur_timezone.sql`. It sets the database default `TimeZone` to `Asia/Kuala_Lumpur` via `current_database()`, so it is portable. There are no role-level timezone overrides live. I verified it in a rolled-back transaction: the setting appeared and then rolled back, and live is unchanged. No data changes; timestamptz values stay stored in UTC.
+- **H-10 (CORS) for `create-payment-intent`:** the `*` origin is replaced by an allow-list.
+  - Defaults: `https://warisan.net`, `https://www.warisan.net`, and the localhost/127.0.0.1 dev and preview ports 5174 and 4174.
+  - The `ALLOWED_ORIGINS` env var (comma-separated) replaces the defaults. Use it to add the preview host once it is chosen, or to drop localhost in production.
+  - Disallowed origins get no `Access-Control-Allow-Origin` header, and `Vary: Origin` is always set.
+  - Deno tests: 12/12, including new P11 and P12.
+
+### Required next steps for Hermes
+1. Apply `20261009000800_kuala_lumpur_timezone.sql` live. New connections then report MYT; existing pooled connections pick it up on reconnect.
+2. Redeploy `create-payment-intent`; it is still `*` live until then. Optionally set `ALLOWED_ORIGINS` as a function secret once the hosting preview URL is known.
+3. `set-user-role` still returns `Access-Control-Allow-Origin: *`. It is admin-only and JWT plus role checked, but it should get the same allow-list for the Warisan.org admin origin. Please confirm the Warisan.org production domain (presumably `https://warisan.org`) and apply the same pattern.
+4. No action is needed on the seed for live. It already matches.

@@ -1,8 +1,9 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
-import { handler } from './handler.ts';
+import { DEFAULT_ALLOWED_ORIGINS, handler } from './handler.ts';
 const url = Deno.env.get('SUPABASE_URL')!;
 const key = Deno.env.get('SUPABASE_ANON_KEY')!;
 function client(jwt: string) { return createClient(url, key, {global: {headers: {Authorization: 'Bearer ' + jwt}}, auth: {persistSession: false, autoRefreshToken: false}}); }
+const allowedOrigins = (Deno.env.get('ALLOWED_ORIGINS') ?? '').split(',').map((o) => o.trim()).filter(Boolean);
 Deno.serve(handler({
   async authenticate(jwt) { const {data, error} = await client(jwt).auth.getUser(jwt); return error ? null : data.user?.id ?? null; },
   async order(jwt, id) {
@@ -10,4 +11,4 @@ Deno.serve(handler({
     if (error) throw new Error('Order lookup failed');
     return data;
   }
-}));
+}, allowedOrigins.length ? allowedOrigins : DEFAULT_ALLOWED_ORIGINS));
