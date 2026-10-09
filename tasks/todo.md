@@ -180,4 +180,8 @@
 
 ## Claude verification 2026-10-09 (H-5 / H-10)
 - [x] Live TimeZone=Asia/Kuala_Lumpur confirmed; live create-payment-intent v3 source == branch; CI 37919460950 + 37919453992 green
-- [ ] BLOCKED (product owner): hosting provider, PR to main approval, Warisan.org domain, H-9 image columns
+- [x] Owner decisions: Warisan.org = warisan.org; PR to main approved to open; hosting = later; H-9 = later
+- [x] set-user-role CORS allow-list for warisan.org (+ dev ports), deno check added to CI
+- [ ] Redeploy set-user-role (Hermes)
+- [ ] Review/merge PR claude/ecstatic-franklin-5j4zw0 → main (owner/Hermes)
+- [ ] Hosting decision (owner) → Auth URLs, preview ALLOWED_ORIGINS

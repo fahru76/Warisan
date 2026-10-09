@@ -1,12 +1,19 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, content-type, apikey', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
+// Ticket H-10: only the Warisan.org admin (plus local dev/preview) may call this from a browser.
+// ALLOWED_ORIGINS (comma-separated) replaces the defaults, e.g. to add a preview host.
+const DEFAULT_ALLOWED_ORIGINS = ['https://warisan.org', 'https://www.warisan.org', 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:4173', 'http://127.0.0.1:4173'];
+const configuredOrigins = (Deno.env.get('ALLOWED_ORIGINS') ?? '').split(',').map((o) => o.trim()).filter(Boolean);
+const ALLOWED_ORIGINS = configuredOrigins.length ? configuredOrigins : DEFAULT_ALLOWED_ORIGINS;
+const baseCors = { 'Access-Control-Allow-Headers': 'authorization, content-type, apikey', 'Access-Control-Allow-Methods': 'POST, OPTIONS', Vary: 'Origin' };
 const ASSIGNABLE_ROLES = ['customer', 'artisan'] as const;
 type AssignableRole = (typeof ASSIGNABLE_ROLES)[number];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
 
 Deno.serve(async (request) => {
+  const origin = request.headers.get('Origin');
+  const cors: Record<string, string> = origin && ALLOWED_ORIGINS.includes(origin) ? { ...baseCors, 'Access-Control-Allow-Origin': origin } : { ...baseCors };
+  const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { ...cors, 'Content-Type': 'application/json' } });
   if (request.method === 'OPTIONS') return new Response('ok', { headers: cors });
   if (request.method !== 'POST') return json({ error: { code: 'METHOD_NOT_ALLOWED', message: 'Use POST.' } }, 405);
   const authHeader = request.headers.get('Authorization');

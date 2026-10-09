@@ -366,3 +366,14 @@ All three are committed. Each needs a Hermes step to take effect live.
 4. H-9: whether to add image columns.
 
 Separately, the signed-in end-to-end test needs a Hermes-provisioned test user, which works best after hosting is chosen.
+
+## Claude: product-owner decisions and set-user-role CORS (2026-10-09)
+Decisions:
+- **Hosting:** decide later.
+- **Warisan.org domain:** `warisan.org`.
+- **H-9 image columns:** later.
+- **PR to `main`:** approved to open, for review. Nothing merges without approval.
+
+Change: `set-user-role` now echoes `Access-Control-Allow-Origin` only for `https://warisan.org`, `https://www.warisan.org` and the org dev/preview ports (`localhost`/`127.0.0.1` on 5173 and 4173), with the same `ALLOWED_ORIGINS` override. `payment-security.yml` now also runs `deno check` on `set-user-role` and triggers on its path.
+
+Hermes next step: **redeploy `set-user-role`**. Live it still returns `*` until then.
