@@ -1,0 +1,38 @@
+name: Live shop smoke
+on:
+  workflow_dispatch:
+  # workflow_dispatch only works once this file is on the default branch, so also run on
+  # pushes that touch the shop. Read-only against live Supabase; never signs in or writes.
+  push:
+    paths:
+      - 'apps/net/**'
+      - 'packages/ui/**'
+      - 'scripts/live-shop-smoke.py'
+      - '.github/workflows/live-shop-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @warisan/net build
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install playwright && python -m playwright install --with-deps chromium
+      - name: Exercise built app against live Supabase
+        run: |
+          pnpm --filter @warisan/net preview --host 127.0.0.1 > /tmp/warisan-preview.log 2>&1 &
+          python scripts/live-shop-smoke.py

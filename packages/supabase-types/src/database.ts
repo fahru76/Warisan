@@ -43,9 +43,50 @@ export interface Workshop {
   is_published: boolean;
 }
 
+// Must match bookings_status_check (migration 20261009000400).
+export type BookingStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
+
+export interface Booking {
+  id: string;
+  workshop_id: string;
+  customer_id: string;
+  quantity: number;
+  status: BookingStatus;
+  pdpa_consent_date: string | null;
+  created_at: string;
+}
+
+// Must match orders_status_check (migration 20261009000500).
+export type OrderStatus = 'pending' | 'paid' | 'processing' | 'fulfilled' | 'cancelled' | 'refunded' | 'failed';
+
+export interface Order {
+  id: string;
+  customer_id: string;
+  status: OrderStatus;
+  total_myr: number;
+  idempotency_key: string | null;
+  created_at: string;
+}
+
+export interface OrderItem {
+  id: string;
+  order_id: string;
+  craft_item_id: string;
+  quantity: number;
+  unit_price_myr: number;
+}
+
+// Arguments for supabase.rpc('create_order', ...) (migration 20261009000600); returns the order id.
+// Prices are never sent: the database reads them from craft_items. Quantity is an integer 1-99.
+export interface CreateOrderArgs {
+  p_items: { craft_item_id: string; quantity: number }[];
+  p_idempotency_key: string;
+}
+
+// Body for the create-payment-intent function; send the Idempotency-Key header as well.
+// The amount is read server-side from the caller's pending order, so it is not part of the input.
 export interface CreatePaymentIntentInput {
   orderId: string;
-  amountMyr: number;
 }
 
 export interface TestPaymentIntent {
