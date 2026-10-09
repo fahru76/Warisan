@@ -130,3 +130,38 @@ The product owner confirmed the order statuses: `pending`, `paid`, `processing`,
 Applied `20261009000500_orders_status_check.sql` live. The database accepts exactly `pending`, `paid`, `processing`, `fulfilled`, `cancelled`, `refunded`, and `failed`; rejects `canceled`, `completed`, `PAID`, and empty status. Live order count was 0.
 
 The remaining security check is order authorization after checkout begins creating real order rows.
+
+## Order creation path and order authorization — 2026-10-09 (Claude)
+
+No code created orders, so order permissions could not be tested. Migration `20261009000600_create_order_rpc.sql` adds `public.create_order(p_items jsonb, p_idempotency_key text) returns uuid`, a security-definer function. It is the only client path to create orders; clients still have no INSERT policy on `orders` or `order_items`.
+
+- Prices are read from `craft_items`. Any client-sent price field is ignored.
+- Only published items from verified artisans can be ordered.
+- Each quantity must be an integer from 1 to 99; there can be 1 to 50 lines, and duplicate items are merged.
+- Orders always start as `pending`. The total is computed from the stored line prices.
+- The idempotency key (8–128 chars) returns the caller's existing order on replay. Another customer reusing the key gets 23505.
+- Execute permission is granted to `authenticated` only; it is revoked from `anon` and `public`.
+
+Script: `supabase/tests/authz_orders.sql` (rolls back; contains no DROP/DELETE). Results with the migration loaded inside the rolled-back transaction:
+
+| # | Case | Result | Expected |
+|---|---|---|---|
+| O1 | anon calls create_order | DENIED 42501 permission denied | ✅ |
+| O2 | customer orders 2 items (dup lines + injected `unit_price_myr: 0.01`) | total 421.50, status pending, 2 lines | ✅ server prices, merged |
+| O3 | replay same idempotency key with different items | same order, still 1 order | ✅ |
+| O4 | unpublished item | DENIED 22023 | ✅ |
+| O5 | unverified artisan item | DENIED 22023 | ✅ |
+| O6/O7/O8 | quantity 0 / −3 / "abc" | DENIED 22023 | ✅ |
+| O9 | empty items | DENIED 22023 | ✅ |
+| O10 | direct insert `orders` status paid | DENIED 42501 RLS | ✅ |
+| O11 | direct insert `order_items` at price 0 | DENIED 42501 RLS | ✅ |
+| O12 | customer marks own order paid | 0 rows | ✅ |
+| O13/O14 | customer sees own order / items | 1 / 2 | ✅ |
+| O15/O16 | other customer sees order / items | 0 / 0 | ✅ |
+| O17 | other customer reuses idempotency key | DENIED 23505 | ✅ |
+
+The migration is committed but not yet applied live. Afterwards the live state was confirmed unchanged: no `create_order` function, 0 orders, 0 users.
+
+### Open finding: payment intent trusts the client amount
+
+`supabase/functions/create-payment-intent/index.ts` takes `orderId` and `amountMyr` from the request body. It does not check that the order exists, belongs to the caller, is `pending`, or that the amount equals `orders.total_myr`. It is test-mode only today, but it must read the amount from the caller's own order before any real payment provider is connected.

@@ -79,3 +79,29 @@ Next step for Hermes: apply `20261009000400_bookings_status_check.sql` live; it 
 - Verified live order count is 0 at application time.
 - Checkout, payment code, and frontend must use these exact spellings.
 - Remaining verification: authenticated order permission tests after checkout begins creating orders.
+
+## Claude order path follow-up (2026-10-09)
+I verified the live `orders_status_check` (7 statuses) after Hermes applied it.
+
+New since the last handoff:
+- `supabase/migrations/20261009000600_create_order_rpc.sql` adds the `public.create_order(p_items jsonb, p_idempotency_key text) → uuid` function.
+  - It is the only client path to create orders.
+  - It uses server-side prices and only allows published items from verified artisans.
+  - It validates quantities, merges duplicate lines, starts every order as `pending`, and handles idempotent replay.
+  - Only `authenticated` users can call it.
+- `supabase/tests/authz_orders.sql` contains tests O1–O17. All passed with the migration loaded inside a rolled-back transaction; results are in `evals/security-hardening.md`. **Not yet applied live.**
+
+Frontend contract (Warisan.net checkout):
+`supabase.rpc('create_order', { p_items: [{ craft_item_id, quantity }], p_idempotency_key })` returns the order id.
+- Generate one idempotency key per checkout attempt, e.g. `crypto.randomUUID()`, and reuse it on retries.
+- Never send prices.
+
+Required next steps for Hermes:
+1. Apply `20261009000600_create_order_rpc.sql` to `wkreaniwmbditbshksja`. It is safe: it only adds a function, and there are 0 orders.
+2. Re-run `supabase/tests/authz_orders.sql` against live; it now runs without the migration loaded inline. Confirm the results match the O1–O17 table.
+3. Harden `create-payment-intent`. It currently trusts the client-sent `amountMyr` and `orderId`. It should:
+   - verify the caller's JWT;
+   - load the order with the caller's client, so RLS ensures ownership;
+   - require `status = 'pending'`;
+   - use `orders.total_myr` as the amount and ignore `amountMyr`.
+4. Optional: add the `create_order` signature to `packages/supabase-types` when the checkout UI is built.

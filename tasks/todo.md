@@ -38,8 +38,10 @@
 - [x] Add bookings status check constraint (migration 20261009000400, verified in rollback)
 - [x] Apply migration 20261009000400 live (Hermes; constraint verified live by Claude)
 - [x] Define orders.status vocabulary (product owner: pending, paid, processing, fulfilled, cancelled, refunded, failed) and add check constraint (migration 20261009000500, verified in rollback)
-- [ ] Apply migration 20261009000500 live
-- [ ] Cover orders/order_items creation path once the checkout Edge Function writes orders
+- [x] Apply migration 20261009000500 live (Hermes)
+- [x] Add server-side create_order RPC (migration 20261009000600) and order authorization tests O1–O17 (supabase/tests/authz_orders.sql, verified in rollback)
+- [ ] Apply migration 20261009000600 live and re-run supabase/tests/authz_orders.sql (Hermes)
+- [ ] Make create-payment-intent read the amount from the caller's order instead of trusting the client (Hermes; see handoff)
 
 ## Phase 4: Frontend handoff
 - [x] Build shared UI package
@@ -57,8 +59,5 @@
 - [x] Redeploy hardened set-user-role function
 
 ## Review
-- Authorization gate: T1–T18 (profiles/artisans) and T19–T33 (inventory/bookings) pass live after migrations 000100–000300. Migration 000400 (booking status check) is live. Order status vocabulary decided (migration 000500, pending live apply), and test the orders path once checkout writes orders.
-
-
-- [x] Apply and verify orders status constraint
-- [ ] Run authenticated order permission tests after checkout creates orders
+- Authorization gate: T1–T18 (profiles/artisans), T19–T33 (inventory/bookings) pass live; booking and order status constraints (000400, 000500) are live.
+- Order path: create_order RPC (000600) and tests O1–O17 pass in rollback; pending live apply. Payment intent must stop trusting client-supplied amounts before real payments.
