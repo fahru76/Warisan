@@ -378,3 +378,11 @@ Change: `set-user-role` now echoes `Access-Control-Allow-Origin` only for `https
 
 Hermes next step: **redeploy `set-user-role`**. Live it still returns `*` until then.
 - **PR opened for review:** https://github.com/fahru76/Warisan/pull/2 (`claude/ecstatic-franklin-5j4zw0` → `main`). It has no conflicts, because `main` is an ancestor of the branch. Payment security CI run 37920134009 is green, including the `set-user-role` `deno check`. Merge only after product-owner or Hermes review.
+
+
+## H-10 set-user-role completion — 2026-10-09
+- Product owner confirmed Warisan.org domains: `warisan.org` and `www.warisan.org`.
+- Redeployed `set-user-role` ACTIVE version 3 with an origin allow-list for `https://warisan.org`, `https://www.warisan.org`, localhost/127.0.0.1 ports 5173 and 4173, plus `ALLOWED_ORIGINS` override support.
+- Payment function remains ACTIVE version 3 with Warisan.net allow-list.
+- Hosting and H-9 image columns are deferred by product-owner decision.
+- PR #2 is open for review into `main`; do not merge `feat/org-bilingual-privacy`.
