@@ -71,3 +71,11 @@ Next step for Hermes: apply `20261009000400_bookings_status_check.sql` live; it 
 - Added `supabase/migrations/20261009000500_orders_status_check.sql`. I verified it in a rolled-back transaction: the default `pending` and all 7 values are accepted; `canceled`, `completed`, `PAID` and the empty string are rejected with 23514. **Not yet applied live.**
 - Next step for Hermes: apply it live. It is safe because there are 0 order rows.
 - Checkout and payment code must use exactly these spellings.
+
+
+## Order status constraint
+- Applied `supabase/migrations/20261009000500_orders_status_check.sql` to live project `wkreaniwmbditbshksja`.
+- Verified `orders_status_check` permits exactly: `pending`, `paid`, `processing`, `fulfilled`, `cancelled`, `refunded`, `failed`.
+- Verified live order count is 0 at application time.
+- Checkout, payment code, and frontend must use these exact spellings.
+- Remaining verification: authenticated order permission tests after checkout begins creating orders.
