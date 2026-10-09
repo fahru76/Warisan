@@ -58,3 +58,10 @@ The fix was verified in a rolled-back transaction. Required next steps for Herme
 - `orders.status` is left unconstrained because its vocabulary isn't defined yet. Hermes: please confirm the order statuses (e.g. `pending` / `paid` / `cancelled` / `refunded`?) so a matching constraint can be added.
 
 Next step for Hermes: apply `20261009000400_bookings_status_check.sql` live; it is safe because there are 0 booking rows.
+
+
+## Booking and order status follow-up
+- Applied `20261009000400_bookings_status_check.sql` live.
+- Verified `public.bookings` now restricts status to `pending`, `confirmed`, `cancelled`, and `completed`.
+- Verified the live `orders.status` column is `text`, defaults to `pending`, and currently has zero rows. No order status vocabulary is confirmed yet; do not add a constraint until product/payment states are decided.
+- Recommended candidate order vocabulary for review: `pending`, `paid`, `processing`, `fulfilled`, `cancelled`, `refunded`. `failed` may be needed if payment failures are persisted; `refunded` should be included if refunds are represented in orders.
