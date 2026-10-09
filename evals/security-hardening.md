@@ -123,3 +123,10 @@ Migration `20261009000400_bookings_status_check.sql` adds `check (status in ('pe
 ## Order status constraint — 2026-10-09 (Claude)
 
 The product owner confirmed the order statuses: `pending`, `paid`, `processing`, `fulfilled`, `cancelled`, `refunded`, `failed`. Migration `20261009000500_orders_status_check.sql` adds the matching check constraint. I verified it in a rolled-back transaction: the default `pending` and all 7 values were accepted; `canceled`, `completed`, `PAID` and the empty string were rejected with 23514. The constraint is committed but not yet applied live.
+
+
+## Order status constraint — 2026-10-09
+
+Applied `20261009000500_orders_status_check.sql` live. The database accepts exactly `pending`, `paid`, `processing`, `fulfilled`, `cancelled`, `refunded`, and `failed`; rejects `canceled`, `completed`, `PAID`, and empty status. Live order count was 0.
+
+The remaining security check is order authorization after checkout begins creating real order rows.
