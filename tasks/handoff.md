@@ -133,3 +133,25 @@ Phase 5 in `tasks/todo.md`:
 Hermes prerequisites before Claude starts:
 - Confirm the Supabase Auth settings for the project: email confirmation on or off, site URL, and redirect URLs for Warisan.net.
 - Confirm that `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set for the `apps/net` preview environment (names only; never commit the values).
+
+
+## Phase 5 Auth readiness — 2026-10-09
+
+Live Auth config inspected for project `wkreaniwmbditbshksja` through the Supabase Management API:
+
+- Email provider: enabled (`external_email_enabled=true`).
+- Email confirmation: ON (`mailer_autoconfirm=false`; `mailer_allow_unverified_email_sign_ins=false`).
+- Current Site URL: `http://localhost:3000` — development default, not production-ready.
+- Current redirect allow-list: no `additional_redirect_urls` value was returned; the config exposes `uri_allow_list`, which must be checked/configured in the Supabase Dashboard.
+
+No Auth settings were changed because the production Warisan.net URL and preview URL are not yet known. Do not guess these URLs.
+
+Required before Phase 5 checkout/auth preview:
+1. Confirm the canonical Warisan.net production URL.
+2. Confirm the preview host pattern/provider (Vercel, Netlify, or other).
+3. Configure the Site URL and exact preview/prod redirect URLs in Supabase Auth URL Configuration.
+4. Configure deployment variables by **name only** in the apps/net preview environment:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+
+The Supabase project URL is known, but no frontend deployment environment was inspected or modified. No secret values were committed.
