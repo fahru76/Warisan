@@ -5,7 +5,7 @@
 - [x] Remove local repository clone
 - [x] Add environment and secret-exclusion contracts
 - [x] Add GitHub Actions remote validation
-- [ ] Configure remote Supabase project credentials
+- [ ] Configure replacement Supabase management token in GitHub Actions manually
 
 ## Phase 1: Monorepo contract
 - [x] Add pnpm workspace and Turborepo task graph
@@ -17,16 +17,24 @@
 - [x] Add provenance UUID and local-pickup fields
 - [x] Add PDPA consent and marketing fields
 - [x] Add role-aware RLS policies and signup trigger
-- [x] Add deterministic seed data
+- [x] Add complete deterministic seed data
 - [x] Add test-mode payment Edge Function
-- [ ] Apply migration to live Supabase project
-- [ ] Verify migration and RLS against live project
+- [x] Apply schema and seed to live Supabase project
+- [x] Deploy and smoke-test payment Edge Function
 
-## Checkpoint: Backend handoff
-- [ ] Remote checks pass
-- [ ] Live Supabase migration verified
-- [ ] Frontend agent begins implementation
+## Phase 3: P0 security hardening
+- [x] Repair corrupted migration SQL in GitHub
+- [x] Prevent client role self-escalation
+- [x] Prevent self-created verified artisans
+- [x] Add server-side privilege mutation triggers
+- [x] Add authorization regression evaluation
+- [ ] Run authenticated negative-path tests with customer and artisan accounts
+
+## Phase 4: Frontend handoff
+- [ ] Build shared UI package
+- [ ] Build Warisan.org trust-layer application
+- [ ] Build Warisan.net commerce-layer application
+- [ ] Integrate Supabase auth and data contracts
 
 ## Review
-- GitHub-only execution adopted.
-- Backend schema, seed, RLS, auth trigger, and test payment contract are present remotely.
+- Live backend exists, but authenticated negative-path tests remain before calling the security gate complete.
