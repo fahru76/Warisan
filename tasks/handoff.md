@@ -24,3 +24,12 @@ Claude may proceed with frontend scaffolding against the schema, but must not as
 1. Apply `20261009000100_fix_privileged_mutation_trigger.sql` to the live project.
 2. Re-run `supabase/tests/authz_negative_paths.sql`. It always rolls back; read the results from the `QA_ROLLBACK` message and confirm they match the table in `evals/security-hardening.md`.
 3. Decide the follow-ups listed there (verified-artisan self-edit, service-role path for role changes).
+
+
+## Claude security test follow-up
+- Applied `20261009000100_fix_privileged_mutation_trigger.sql` live to `wkreaniwmbditbshksja`.
+- Re-ran `supabase/tests/authz_negative_paths.sql`; the API returned HTTP 400 because the script intentionally raises `QA_ROLLBACK`. The embedded T1–T18 results match the expected security outcomes.
+- T15 now allows verified artisans to edit safe profile fields.
+- Verified artisan owners still cannot change `is_verified` or `profile_id`.
+- Client role changes remain forbidden.
+- Deployed ACTIVE `set-user-role` Edge Function, JWT-protected and admin-only, for server-side role changes.
