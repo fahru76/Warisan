@@ -1,15 +1,13 @@
-import { serve } from 'https://deno.land/std@0.224.0/http/server.ts';
-const corsHeaders = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, idempotency-key', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
-serve(async (request) => {
-  if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
-  if (request.method !== 'POST') return json({ error: { code: 'METHOD_NOT_ALLOWED', message: 'Use POST.' } }, 405);
-  try {
-    const body = await request.json();
-    const orderId = typeof body.orderId === 'string' ? body.orderId : '';
-    const amountMyr = typeof body.amountMyr === 'number' ? body.amountMyr : NaN;
-    const idempotencyKey = request.headers.get('idempotency-key') || '';
-    if (!orderId || !Number.isFinite(amountMyr) || amountMyr <= 0 || !idempotencyKey) return json({ error: { code: 'VALIDATION_ERROR', message: 'orderId, positive amountMyr, and Idempotency-Key are required.' } }, 422);
-    return json({ data: { mode: 'test', paymentIntentId: 'test_' + orderId, orderId, amountMyr, status: 'requires_confirmation' } });
-  } catch { return json({ error: { code: 'INVALID_JSON', message: 'Request body must be valid JSON.' } }, 400); }
-});
-function json(body: unknown, status = 200) { return new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }); }
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.1';
+import { handler } from './handler.ts';
+const url = Deno.env.get('SUPABASE_URL')!;
+const key = Deno.env.get('SUPABASE_ANON_KEY')!;
+function client(jwt: string) { return createClient(url, key, {global: {headers: {Authorization: 'Bearer ' + jwt}}, auth: {persistSession: false, autoRefreshToken: false}}); }
+Deno.serve(handler({
+  async authenticate(jwt) { const {data, error} = await client(jwt).auth.getUser(jwt); return error ? null : data.user?.id ?? null; },
+  async order(jwt, id) {
+    const {data, error} = await client(jwt).from('orders').select('id,customer_id,status,total_myr').eq('id', id).maybeSingle();
+    if (error) throw new Error('Order lookup failed');
+    return data;
+  }
+}));
