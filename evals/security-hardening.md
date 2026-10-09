@@ -174,3 +174,12 @@ Finding fixed before any real provider integration: the previous function truste
 The function now requires a user JWT, reads the caller's order through the caller-scoped Supabase client, returns 404 for another user's/missing order, requires `pending`, and derives `amountMyr` from `orders.total_myr`. Client-supplied amounts are ignored. Invalid UUIDs, invalid keys, zero totals, and backend failures are rejected.
 
 Added deterministic unit tests in `supabase/functions/create-payment-intent/handler_test.ts` and GitHub workflow `.github/workflows/payment-security.yml`. Live deployment is ACTIVE version 2 with JWT verification. Smoke tests: missing auth returned 401; publishable key without a user JWT returned 401.
+
+## Independent verification of order RPC and payment hardening — 2026-10-09 (Claude)
+
+- `create_order` is live as a security-definer function. `anon` has no execute permission and `authenticated` does. There are 0 orders and 0 users, so no QA residue.
+- `create-payment-intent` handler tests: P1–P10 all pass locally (Deno 2.1.4) and in GitHub Actions run 37889240049. The local `deno check index.ts` could not fetch `esm.sh` through the sandbox proxy, but CI's `deno check` step passed.
+- I reviewed the handler: the order is read with the caller-scoped client (RLS), `customer_id` is checked again, status must be `pending`, the amount comes from `total_myr`, and failures are closed (503). No issues found.
+- `@warisan/supabase-types`: `CreatePaymentIntentInput` no longer contains `amountMyr`, so frontend code cannot be steered into sending prices. Order, booking and `create_order` types now match the live constraints.
+
+**Backend authorization gate: complete for the current scope** (profiles, artisans, inventory, bookings, orders, payment intent).

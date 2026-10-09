@@ -60,11 +60,20 @@
 
 ## Review
 - Authorization gate: T1–T18 (profiles/artisans), T19–T33 (inventory/bookings) pass live; booking and order status constraints (000400, 000500) are live.
-- Order path: create_order RPC (000600) and tests O1–O17 pass in rollback; pending live apply. Payment intent must stop trusting client-supplied amounts before real payments.
+- Order path: create_order (000600) is live, O1–O17 pass; payment intent reads the amount from the caller's pending order (P1–P10, CI green). Backend authorization gate: COMPLETE for current scope.
 
 
 - [x] Apply and verify create_order RPC
 - [x] Re-run O1–O17 order authorization tests
 - [x] Harden and redeploy create-payment-intent ownership/amount checks
 - [x] Add payment security regression tests and CI workflow
-- [ ] Run authenticated order permission tests after checkout creates persistent order rows
+- [x] Run authenticated order permission tests (O1–O17 against the live create_order function, rolled back; Claude verified live grants: anon no execute, authenticated execute)
+- [x] Verify payment-intent hardening: P1–P10 pass locally (Claude) and in CI run 37889240049
+- [x] Align @warisan/supabase-types with live contract (Order/OrderItem/Booking, status unions, CreateOrderArgs; amountMyr removed from payment input)
+
+## Phase 5: Warisan.net commerce UI (proposed, awaiting go-ahead)
+- [ ] Customer sign-in/sign-up (Supabase Auth) with PDPA consent capture
+- [ ] Catalog of published items from verified artisans
+- [ ] Cart and checkout: create_order, then create-payment-intent (test mode)
+- [ ] Customer order history (RLS-scoped)
+- [ ] Workshop listing and pending booking flow

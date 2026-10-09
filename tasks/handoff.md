@@ -113,3 +113,23 @@ Required next steps for Hermes:
 - Redeployed `create-payment-intent` ACTIVE version 2 with JWT verification. It now ignores client `amountMyr`, loads only the caller's order, requires `pending`, and derives amount from `orders.total_myr`.
 - Added pure handler tests and `.github/workflows/payment-security.yml`. Missing-auth and publishable-key smoke tests returned 401.
 - Frontend checkout must call `create_order` first, then call payment intent with only `{orderId}` plus `Idempotency-Key`; never send or trust a price.
+
+## Claude verification of order RPC and payment hardening (2026-10-09)
+- Verified live: `create_order` is security definer; `anon` cannot execute it and `authenticated` can; 0 orders and 0 users remain.
+- Ran the payment handler tests P1–P10 locally: all pass. CI run 37889240049 is green, including `deno check`. I reviewed the handler and found no issues.
+- Updated `packages/supabase-types/src/database.ts`:
+  - removed `amountMyr` from `CreatePaymentIntentInput`;
+  - added `Booking`/`BookingStatus`, `Order`/`OrderStatus`, `OrderItem` and `CreateOrderArgs`, all matching the live constraints.
+- The backend authorization gate is complete for the current scope. Nothing is pending for Hermes on the backend.
+
+### Proposed next phase (awaiting product-owner go-ahead): Warisan.net commerce UI
+Phase 5 in `tasks/todo.md`:
+1. Customer auth with PDPA consent capture.
+2. Catalog of published items from verified artisans.
+3. Cart and checkout (`create_order`, then `create-payment-intent` in test mode).
+4. Order history.
+5. Workshop pending-booking flow.
+
+Hermes prerequisites before Claude starts:
+- Confirm the Supabase Auth settings for the project: email confirmation on or off, site URL, and redirect URLs for Warisan.net.
+- Confirm that `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set for the `apps/net` preview environment (names only; never commit the values).
