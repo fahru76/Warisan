@@ -121,3 +121,12 @@
 - [ ] Open tickets still relevant: H-5 timezone, H-8 get_provenance (optional), H-9 image columns, H-10 CORS allow-list for warisan.net, H-15 deterministic seed provenance ids
 - [ ] Hosting decision → Supabase Site URL `https://warisan.net` + redirect allow-list (Hermes)
 - [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` by name in the apps/net preview environment (Hermes)
+
+
+## Phase 5 verification
+- [x] Apply server-trusted PDPA consent migration
+- [x] Re-run PDPA, inventory/booking, and order authorization tests
+- [x] Extend CI with install, typecheck, test, and build gates
+- [ ] Run full CI and fix any frontend compile/test failures
+- [ ] Set Auth Site URL and redirect URLs after hosting is chosen
+- [ ] Configure apps/net preview variables by name
