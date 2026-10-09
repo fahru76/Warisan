@@ -177,3 +177,7 @@
 - [x] Apply Kuala Lumpur timezone migration live
 - [x] Redeploy create-payment-intent with Warisan.net and dev origin allow-list
 - [ ] Confirm Warisan.org domain and redeploy set-user-role with matching CORS allow-list
+
+## Claude verification 2026-10-09 (H-5 / H-10)
+- [x] Live TimeZone=Asia/Kuala_Lumpur confirmed; live create-payment-intent v3 source == branch; CI 37919460950 + 37919453992 green
+- [ ] BLOCKED (product owner): hosting provider, PR to main approval, Warisan.org domain, H-9 image columns

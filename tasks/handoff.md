@@ -352,3 +352,17 @@ All three are committed. Each needs a Hermes step to take effect live.
 - Applied `20261009000800_kuala_lumpur_timezone.sql` to `wkreaniwmbditbshksksja` (project ref `wkreaniwmbditbshksja`); the migration completed successfully.
 - Redeployed `create-payment-intent` ACTIVE version 3 with default origins for `https://warisan.net`, `https://www.warisan.net`, `http://localhost:5173`, and `http://localhost:5174`; `ALLOWED_ORIGINS` can override/add preview origins later.
 - `set-user-role` still has wildcard CORS in the branch code. Do not redeploy its CORS change until the Warisan.org production domain is confirmed.
+
+## Claude verification of H-5 / H-10 (2026-10-09)
+- **Live database:** `TimeZone=Asia/Kuala_Lumpur` is set at database level.
+- **Live `create-payment-intent` (version 3, `verify_jwt` on):** the source fetched from Supabase is identical to the branch code. **Correction to the note above:** the default origins are `https://warisan.net`, `https://www.warisan.net`, `http://localhost:5174`, `http://127.0.0.1:5174`, `http://localhost:4174` and `http://127.0.0.1:4174`. `localhost:5173` is **not** included; that is the Warisan.org dev port, which does not call this function.
+- **CI on `c5dfbcd`:** validate run 37919460950 and payment security run 37919453992 are both green.
+- Backend tickets H-5, H-10 (payment function) and H-15 are closed.
+
+### Everything remaining is blocked on product-owner decisions
+1. Hosting provider. This drives the Auth Site URL, the redirect allow-list and `ALLOWED_ORIGINS` for previews.
+2. Approval to open a PR from `claude/ecstatic-franklin-5j4zw0` to `main`.
+3. Warisan.org production domain, needed for the `set-user-role` CORS allow-list.
+4. H-9: whether to add image columns.
+
+Separately, the signed-in end-to-end test needs a Hermes-provisioned test user, which works best after hosting is chosen.
