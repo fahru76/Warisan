@@ -1,6 +1,14 @@
 name: Live shop smoke
 on:
   workflow_dispatch:
+  # workflow_dispatch only works once this file is on the default branch, so also run on
+  # pushes that touch the shop. Read-only against live Supabase; never signs in or writes.
+  push:
+    paths:
+      - 'apps/net/**'
+      - 'packages/ui/**'
+      - 'scripts/live-shop-smoke.py'
+      - '.github/workflows/live-shop-smoke.yml'
 permissions:
   contents: read
 jobs:
@@ -23,7 +31,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install playwright && python -m playwright install --with-deps chromium
+      # Uses the Google Chrome preinstalled on GitHub's Ubuntu runners instead of `playwright install --with-deps`,
+      # whose apt step hung for the full job timeout on 2026-10-22 (runs 39805789875, 39808007151).
+      - name: Install Playwright (Python package only)
+        timeout-minutes: 3
+        run: pip install playwright==1.62.0
       - name: Exercise built app against live Supabase
         run: |
           pnpm --filter @warisan/net preview --host 127.0.0.1 > /tmp/warisan-preview.log 2>&1 &

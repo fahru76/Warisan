@@ -219,3 +219,12 @@ The migration records signup consent with server time, never client time; ignore
 ## Phase 5 execution verification — 2026-10-09
 
 Live PDPA migration and all three rolled-back test suites were applied/run. The validation workflow run `37892163405` passed install, validation, typecheck, test, and build. Live shop smoke assets were added; the smoke workflow remains a manual dispatch because no hosting provider is selected yet.
+
+## Live browser smoke — 2026-10-09 (Claude)
+
+GitHub Actions run 37918314667 (`live-shop-smoke.yml`, commit `f7206b9`) built Warisan.net and drove it with Chromium against live Supabase. All checks are read-only and run as an anonymous visitor:
+- 10 published craft items and 3 workshops are visible to anon.
+- All 10 items render through the `artisans!inner` verified join.
+- The craft detail and workshops pages render.
+- Checkout shows the sign-in requirement, and "Pay with FPX" is disabled.
+- No page falls back to demo data, and there are no JavaScript errors.

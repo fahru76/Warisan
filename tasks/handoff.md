@@ -293,3 +293,127 @@ The bilingual/PDPA features from Hermes's `main` commits already exist in the me
 - Added GitHub Actions secrets by name: `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Values are not recorded in Markdown or source.
 - Added manual `live-shop-smoke.yml` and `scripts/live-shop-smoke.py` to build Warisan.net, query the live published catalogue, render the built app in Chromium, and fail on page errors.
 - Auth settings remain: email confirmation ON, Site URL `http://localhost:3000`; production is `https://warisan.net`, but preview hosting is not selected. Do not change Auth URLs until a hosting provider/preview URL is confirmed.
+
+## Claude follow-up: live shop smoke (2026-10-09)
+- Reviewed Hermes's CI and smoke changes. `validate.yml` now gates install, validate, typecheck, test and build, and its earlier run 37892163405 was green.
+- `workflow_dispatch` for `live-shop-smoke.yml` returned **404** from the GitHub API. Dispatch only works once the workflow file is on the default branch, and it is only on this branch. I added a `push` trigger scoped to shop paths (`apps/net/**`, `packages/ui/**`, the script and the workflow) so it runs from this branch now. It is read-only against live Supabase: it never signs in or writes.
+- I extended `scripts/live-shop-smoke.py`. It now:
+  - asserts that **every** live published item renders on the home page, which proves the `artisans!inner` verified join works through live PostgREST (the open item from Phase 3.1);
+  - fails if any page falls back to demo data;
+  - checks that the craft detail and `/workshops` pages render;
+  - checks that checkout tells an anonymous visitor to sign in and keeps "Pay with FPX" disabled.
+- **Result:** Live shop smoke run **37918314667 passed**. Anon sees 10 craft items and 3 workshops, all 10 render on the home page, detail, checkout gate and workshops all pass, and there were no JS errors. Validate CI run **37918346730 passed** on the same commit (`f7206b9`): install, validate, typecheck, test, build.
+- With this, the Phase 3.1 open item ("PostgREST `!inner` embed syntax against live REST") is **verified**.
+
+### Still open
+- **Product owner:** choose hosting (Vercel, Netlify or Cloudflare Pages). Then Hermes sets the Auth Site URL `https://warisan.net` and the redirect allow-list, plus the env names on the host.
+- **Merge to `main`:** this branch carries all the backend hardening and the working frontend, while `main` still has the frontend that doesn't compile. Opening a PR from `claude/ecstatic-franklin-5j4zw0` to `main` needs product-owner approval. Once merged, `workflow_dispatch` for `live-shop-smoke.yml` also works.
+- **Authenticated end-to-end run:** sign-up with email confirmation, then checkout and booking. This needs a real inbox or a test user created by Hermes, plus cleanup afterwards, so it is left to Hermes or a manual pass after hosting.
+- **Tickets for Hermes:** H-5 timezone, H-9 image columns, H-10 CORS allow-list (once hosting is known), H-15 deterministic seed provenance IDs.
+- **Minor:** GitHub warns that the actions in all workflows target the deprecated Node 20 runtime. Bump `actions/checkout`, `actions/setup-node`, `actions/setup-python` and `pnpm/action-setup` when convenient.
+
+
+## Current release handoff — 2026-10-09
+
+- Live shop smoke run `37918314667` passed: 10 items and 3 workshops rendered; detail and workshop pages worked; anonymous checkout was gated; no JavaScript errors; verified-artisan join was confirmed live.
+- Validate CI run `37918346730` is green on commit `f7206b9`.
+- The live smoke workflow runs on pushes touching the shop because manual dispatch returned 404 until the workflow exists on `main`.
+- Do not merge `feat/org-bilingual-privacy`; the working frontend came from `claude/new-session-b00fhf` and Phase 5 work is on this branch.
+- Merge to `main` is waiting for product-owner approval.
+
+### Remaining work
+- Provision and clean up a confirmed-email test user, then run signed-in end-to-end signup/checkout/booking verification. Credentials must not be committed or sent in chat.
+- H-5 timezone: pin database/session behavior to `Asia/Kuala_Lumpur`.
+- H-9: add image columns if product accepts the schema addition.
+- H-10: restrict Edge Function CORS after hosting URLs are known.
+- H-15: make seed provenance UUIDs deterministic.
+- Update GitHub Actions action versions to remove the Node 20 deprecation warnings.
+- Set Supabase Auth Site URL and redirect allow-list after hosting is selected.
+
+## Claude: H-5, H-10, H-15 (2026-10-09)
+All three are committed. Each needs a Hermes step to take effect live.
+
+- **H-15 (seed provenance IDs), done in git:** `supabase/seed.sql` now pins every craft item `id` and `provenance_id`, and every workshop `id`, to the **current live values**. Printed QR codes therefore resolve in every environment. Inserts use `on conflict(id) do nothing`. I ran the new seed against live inside a rolled-back transaction: items stayed at 10 and workshops at 3, a no-op.
+- **H-5 (timezone), new migration** `supabase/migrations/20261009000800_kuala_lumpur_timezone.sql`. It sets the database default `TimeZone` to `Asia/Kuala_Lumpur` via `current_database()`, so it is portable. There are no role-level timezone overrides live. I verified it in a rolled-back transaction: the setting appeared and then rolled back, and live is unchanged. No data changes; timestamptz values stay stored in UTC.
+- **H-10 (CORS) for `create-payment-intent`:** the `*` origin is replaced by an allow-list.
+  - Defaults: `https://warisan.net`, `https://www.warisan.net`, and the localhost/127.0.0.1 dev and preview ports 5174 and 4174.
+  - The `ALLOWED_ORIGINS` env var (comma-separated) replaces the defaults. Use it to add the preview host once it is chosen, or to drop localhost in production.
+  - Disallowed origins get no `Access-Control-Allow-Origin` header, and `Vary: Origin` is always set.
+  - Deno tests: 12/12, including new P11 and P12.
+
+### Required next steps for Hermes
+1. Apply `20261009000800_kuala_lumpur_timezone.sql` live. New connections then report MYT; existing pooled connections pick it up on reconnect.
+2. Redeploy `create-payment-intent`; it is still `*` live until then. Optionally set `ALLOWED_ORIGINS` as a function secret once the hosting preview URL is known.
+3. `set-user-role` still returns `Access-Control-Allow-Origin: *`. It is admin-only and JWT plus role checked, but it should get the same allow-list for the Warisan.org admin origin. Please confirm the Warisan.org production domain (presumably `https://warisan.org`) and apply the same pattern.
+4. No action is needed on the seed for live. It already matches.
+
+
+## H-5 / H-10 live application — 2026-10-09
+- Applied `20261009000800_kuala_lumpur_timezone.sql` to `wkreaniwmbditbshksksja` (project ref `wkreaniwmbditbshksja`); the migration completed successfully.
+- Redeployed `create-payment-intent` ACTIVE version 3 with default origins for `https://warisan.net`, `https://www.warisan.net`, `http://localhost:5173`, and `http://localhost:5174`; `ALLOWED_ORIGINS` can override/add preview origins later.
+- `set-user-role` still has wildcard CORS in the branch code. Do not redeploy its CORS change until the Warisan.org production domain is confirmed.
+
+## Claude verification of H-5 / H-10 (2026-10-09)
+- **Live database:** `TimeZone=Asia/Kuala_Lumpur` is set at database level.
+- **Live `create-payment-intent` (version 3, `verify_jwt` on):** the source fetched from Supabase is identical to the branch code. **Correction to the note above:** the default origins are `https://warisan.net`, `https://www.warisan.net`, `http://localhost:5174`, `http://127.0.0.1:5174`, `http://localhost:4174` and `http://127.0.0.1:4174`. `localhost:5173` is **not** included; that is the Warisan.org dev port, which does not call this function.
+- **CI on `c5dfbcd`:** validate run 37919460950 and payment security run 37919453992 are both green.
+- Backend tickets H-5, H-10 (payment function) and H-15 are closed.
+
+### Everything remaining is blocked on product-owner decisions
+1. Hosting provider. This drives the Auth Site URL, the redirect allow-list and `ALLOWED_ORIGINS` for previews.
+2. Approval to open a PR from `claude/ecstatic-franklin-5j4zw0` to `main`.
+3. Warisan.org production domain, needed for the `set-user-role` CORS allow-list.
+4. H-9: whether to add image columns.
+
+Separately, the signed-in end-to-end test needs a Hermes-provisioned test user, which works best after hosting is chosen.
+
+## Claude: product-owner decisions and set-user-role CORS (2026-10-09)
+Decisions:
+- **Hosting:** decide later.
+- **Warisan.org domain:** `warisan.org`.
+- **H-9 image columns:** later.
+- **PR to `main`:** approved to open, for review. Nothing merges without approval.
+
+Change: `set-user-role` now echoes `Access-Control-Allow-Origin` only for `https://warisan.org`, `https://www.warisan.org` and the org dev/preview ports (`localhost`/`127.0.0.1` on 5173 and 4173), with the same `ALLOWED_ORIGINS` override. `payment-security.yml` now also runs `deno check` on `set-user-role` and triggers on its path.
+
+Hermes next step: **redeploy `set-user-role`**. Live it still returns `*` until then.
+- **PR opened for review:** https://github.com/fahru76/Warisan/pull/2 (`claude/ecstatic-franklin-5j4zw0` → `main`). It has no conflicts, because `main` is an ancestor of the branch. Payment security CI run 37920134009 is green, including the `set-user-role` `deno check`. Merge only after product-owner or Hermes review.
+
+## Claude: branch restored after repository reset (2026-10-22)
+For Codex as coordinator: please reconcile this with `codex/ai-coordination-takeover`.
+- On 2026-10-22 the GitHub repo showed only `main` (`22e733e`) and `codex/ai-coordination-takeover`. This branch, `claude/new-session-b00fhf`, `feat/org-bilingual-privacy` and PR #2 were gone (PR #2 returned 404; PR numbering restarted at #1).
+- I restored this branch (`claude/ecstatic-franklin-5j4zw0`, head `fbb640f`) from Claude's container after the owner fixed push access. It is `main` (`22e733e`) plus 10 commits:
+  - `f7206b9` live smoke on push (detail, checkout gate, workshops);
+  - `c5dfbcd` H-15 seed IDs pinned to live, H-5 timezone migration `20261009000800`, H-10 payment CORS allow-list;
+  - `d91e1a6` `set-user-role` CORS allow-list for warisan.org;
+  - documentation commits.
+- **GitHub vs production gap.** As of the last live check (2026-10-09), production already ran code that is only on this branch: migration `20261009000800` (TimeZone `Asia/Kuala_Lumpur`) and `create-payment-intent` v3 with the origin allow-list. Do **not** redeploy Edge Functions or push migrations from `main` until this branch is merged; doing so would restore wildcard CORS and diverge from the live migration history.
+- Corrections to `tasks/takeover-assessment-2026-10-22.md`:
+  - Payment CORS is no longer a wildcard (fixed in `c5dfbcd` and deployed live as v3).
+  - A live-shop-smoke run did pass: run 37918314667 on 2026-10-09. Its record is not visible in the recreated repo.
+  - H-5, H-10 (payment function) and H-15 are done. Only the `set-user-role` redeploy remains.
+- Claude's Supabase MCP access returns "permission denied" as of 2026-10-22, so none of the above could be re-verified live today.
+- Still lost and not restored: `claude/new-session-b00fhf` (fully contained in this branch) and `feat/org-bilingual-privacy` (superseded). Neither is needed.
+
+## Claude: response to Codex's restored-branch review (2026-10-22)
+Scope: `supabase/seed.sql` and `scripts/live-shop-smoke.py` (SEED-1 and the P3 smoke finding), plus this handoff and `tasks/todo.md`. The product owner handed the review back to Claude ("Codex done"). Nothing outside this scope was edited, and no database writes were made.
+
+- **[P2] Seed reruns on legacy databases: fixed.**
+  - Both the craft item and workshop inserts now combine the fixed IDs with the old name/title guard: `where not exists (... name/title ...) on conflict(id) do nothing`.
+  - A fresh database gets exactly the live IDs and provenance IDs.
+  - A database seeded by the older random-ID seed keeps its existing rows and IDs, so no orders, bookings or printed QR codes break, and no duplicates are added.
+  - **Evidence:** PGlite (Postgres in WASM) loaded the initial schema's tables:
+
+    | Scenario | Items / names | Workshops | Fixed IDs |
+    |---|---|---|---|
+    | A. fresh DB + new seed | 10 / 10 | 3 | present |
+    | B. fresh DB + new seed twice | 10 / 10 | 3 | present |
+    | C. old seed + new seed | 10 / 10 | 3 | legacy IDs kept |
+    | D. old seed + new seed twice | 10 / 10 | 3 | legacy IDs kept |
+
+    Re-running scenario C with the previous seed (`e056997`) reproduced the finding: 20 items and 6 workshops.
+  - Production uses the fixed IDs, so the seed stays a no-op there. That was historically verified on 2026-10-09; it cannot be re-checked today because Supabase access is denied.
+- **[P3] Workshops smoke coverage: fixed.** The script always visits `/workshops` and requires the "Workshops" `h1`. It then asserts that every live workshop title renders, or that the "No workshops scheduled." empty state shows when there are none. The push re-runs the live smoke workflow; the empty-state branch is only exercised when live has 0 workshops.
+- **Smoke CI hang: fixed.** Runs 39805789875 (cancelled at the 10-minute limit) and 39808007151 both stalled inside `playwright install --with-deps chromium`, in its apt step, before any Supabase call. The workflow now installs only the pinned Python package (`playwright==1.62.0`, with a 3-minute step timeout), and the script launches the runner's preinstalled Google Chrome (`channel='chrome'`). This is not evidence about production; the next run provides fresh live evidence.
+- **Smoke result after the fix (run 39808203459, `b9093ec`):** the install step finished in about 3 s (the hang is fixed). The live step then failed immediately with `AssertionError: Missing VITE_SUPABASE_* configuration`. **The recreated repository has no `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` Actions secrets**; they were lost in the reset along with the branches. The owner must re-add both, by name, under repo Settings → Secrets and variables → Actions. Then re-run `live-shop-smoke.yml` (or push a shop-path change) for fresh live evidence. No production state was touched, and none could be verified today.
+- **CI on this branch:** Validate run 39808018331 is green on `c45f745`. Payment security (P1–P12 plus both `deno check`s) was green on `fbb640f` (run 39805789882); the later commits do not touch functions.

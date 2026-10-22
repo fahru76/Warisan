@@ -1,10 +1,17 @@
 type Order = { id: string; customer_id: string; status: string; total_myr: number | string };
 export type Backend = { authenticate: (jwt: string) => Promise<string | null>; order: (jwt: string, id: string) => Promise<Order | null> };
-const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, idempotency-key', 'Access-Control-Allow-Methods': 'POST, OPTIONS' };
+// Ticket H-10: browsers may call this function only from Warisan.net origins (plus local dev/preview).
+// Override with the ALLOWED_ORIGINS env var (comma-separated) once preview hosting is known.
+export const DEFAULT_ALLOWED_ORIGINS = ['https://warisan.net', 'https://www.warisan.net', 'http://localhost:5174', 'http://127.0.0.1:5174', 'http://localhost:4174', 'http://127.0.0.1:4174'];
+const baseCors = { 'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, idempotency-key', 'Access-Control-Allow-Methods': 'POST, OPTIONS', Vary: 'Origin' };
+export function corsHeaders(origin: string | null, allowed: readonly string[]): Record<string, string> {
+  return origin && allowed.includes(origin) ? { ...baseCors, 'Access-Control-Allow-Origin': origin } : { ...baseCors };
+}
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-function response(body: unknown, status = 200) { return new Response(JSON.stringify(body), {status, headers: {...cors, 'Content-Type': 'application/json'}}); }
-function error(code: string, message: string, status: number) { return response({error: {code, message}}, status); }
-export function handler(backend: Backend) { return async (req: Request) => {
+export function handler(backend: Backend, allowedOrigins: readonly string[] = DEFAULT_ALLOWED_ORIGINS) { return async (req: Request) => {
+  const cors = corsHeaders(req.headers.get('Origin'), allowedOrigins);
+  const response = (body: unknown, status = 200) => new Response(JSON.stringify(body), {status, headers: {...cors, 'Content-Type': 'application/json'}});
+  const error = (code: string, message: string, status: number) => response({error: {code, message}}, status);
   if (req.method === 'OPTIONS') return new Response('ok', {headers: cors});
   if (req.method !== 'POST') return error('METHOD_NOT_ALLOWED', 'Use POST.', 405);
   const match = /^Bearer ([^\s]+)$/i.exec(req.headers.get('Authorization') ?? '');

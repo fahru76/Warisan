@@ -95,7 +95,7 @@
 - [x] Provenance page: "Maker not verified" state; never shows "authentic" for unverified makers
 - [x] `pnpm test` 64/64, typecheck 3/3, build 2/2
 - [x] Live check as `anon` via SQL: verified join returns 10/10 items, 3/3 workshops (no regression)
-- [ ] Not verified: PostgREST `!inner` embed syntax against live REST (sandbox egress blocks *.supabase.co) — check on first `.env.local` run
+- [x] PostgREST `!inner` embed verified against live REST (live smoke run 37918314667)
 
 - Authorization gate: T1–T18 (profiles/artisans), T19–T33 (inventory/bookings) pass live; booking and order status constraints (000400, 000500) are live.
 - Order path: create_order (000600) is live, O1–O17 pass; payment intent reads the amount from the caller's pending order (P1–P10, CI green). Backend authorization gate: COMPLETE for current scope.
@@ -117,7 +117,7 @@
 - [x] Workshop booking via `api.requestBooking`: consent required + server-stamped (000700, B1–B2), friendly capacity/duplicate/unavailable errors
 - [x] Evals: `evals/checkout-contract.test.ts` (12 tests; 76/76 total), typecheck 3/3, build 2/2
 - [ ] Apply migration 20261009000700 live and re-run `supabase/tests/pdpa_consent.sql` (Hermes)
-- [ ] Live browser smoke test against Supabase (blocked in Claude's sandbox: *.supabase.co egress denied) — run from a machine/preview with `VITE_SUPABASE_*` set
+- [x] Live browser smoke test against Supabase (GitHub Actions run 37918314667: catalogue, detail, checkout sign-in gate, workshops; no JS errors)
 - [ ] Open tickets still relevant: H-5 timezone, H-8 get_provenance (optional), H-9 image columns, H-10 CORS allow-list for warisan.net, H-15 deterministic seed provenance ids
 - [ ] Hosting decision → Supabase Site URL `https://warisan.net` + redirect allow-list (Hermes)
 - [ ] Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` by name in the apps/net preview environment (Hermes)
@@ -127,7 +127,7 @@
 - [x] Apply server-trusted PDPA consent migration
 - [x] Re-run PDPA, inventory/booking, and order authorization tests
 - [x] Extend CI with install, typecheck, test, and build gates
-- [ ] Run full CI and fix any frontend compile/test failures
+- [x] Run full CI and fix any frontend compile/test failures (validate run 37892163405 green; Claude re-checked 2026-10-09)
 - [ ] Set Auth Site URL and redirect URLs after hosting is chosen
 - [ ] Configure apps/net preview variables by name
 
@@ -137,5 +137,62 @@
 - [x] CI runs install, typecheck, test, and build
 - [x] Configure preview variable names as GitHub Actions secrets
 - [x] Add live Warisan.net smoke workflow
-- [ ] Run live-shop-smoke workflow after preview workflow is manually dispatched
+- [x] Live-shop-smoke now also runs on pushes touching the shop (dispatch 404s until the workflow is on main); extended to detail, checkout sign-in gate, workshops, no demo fallback
 - [ ] Set Auth Site URL and redirect URLs after hosting is chosen
+
+## Next (after Phase 5 live smoke)
+- [ ] Product owner: choose hosting provider → Hermes sets Auth Site URL `https://warisan.net` + redirect allow-list + host env names
+- [ ] Product owner: approve PR `claude/ecstatic-franklin-5j4zw0` → `main` (main's frontend does not compile)
+- [ ] Authenticated E2E (sign-up + email confirm, checkout, booking) with a Hermes-provisioned test user and cleanup
+- [ ] Bump GitHub Actions off deprecated Node 20 runtime
+
+
+## Current release handoff — 2026-10-09
+
+- Live shop smoke run `37918314667` passed: 10 items and 3 workshops rendered; detail and workshop pages worked; anonymous checkout was gated; no JavaScript errors; verified-artisan join was confirmed live.
+- Validate CI run `37918346730` is green on commit `f7206b9`.
+- The live smoke workflow runs on pushes touching the shop because manual dispatch returned 404 until the workflow exists on `main`.
+- Do not merge `feat/org-bilingual-privacy`; the working frontend came from `claude/new-session-b00fhf` and Phase 5 work is on this branch.
+- Merge to `main` is waiting for product-owner approval.
+
+### Remaining work
+- Provision and clean up a confirmed-email test user, then run signed-in end-to-end signup/checkout/booking verification. Credentials must not be committed or sent in chat.
+- H-5 timezone: pin database/session behavior to `Asia/Kuala_Lumpur`.
+- H-9: add image columns if product accepts the schema addition.
+- H-10: restrict Edge Function CORS after hosting URLs are known.
+- H-15: make seed provenance UUIDs deterministic.
+- Update GitHub Actions action versions to remove the Node 20 deprecation warnings.
+- Set Supabase Auth Site URL and redirect allow-list after hosting is selected.
+
+## Claude 2026-10-09: tickets H-5 / H-10 / H-15
+- [x] H-15 seed pins live ids + provenance_ids (verified no-op against live in rollback)
+- [x] H-5 migration 20261009000800 (Asia/Kuala_Lumpur), verified in rollback
+- [x] H-10 create-payment-intent origin allow-list + ALLOWED_ORIGINS override (Deno 12/12)
+- [ ] Apply 20261009000800 live (Hermes)
+- [ ] Redeploy create-payment-intent with the allow-list (Hermes)
+- [ ] Same allow-list for set-user-role once the Warisan.org domain is confirmed (Hermes)
+
+
+## H-5 / H-10 execution
+- [x] Apply Kuala Lumpur timezone migration live
+- [x] Redeploy create-payment-intent with Warisan.net and dev origin allow-list
+- [ ] Confirm Warisan.org domain and redeploy set-user-role with matching CORS allow-list
+
+## Claude verification 2026-10-09 (H-5 / H-10)
+- [x] Live TimeZone=Asia/Kuala_Lumpur confirmed; live create-payment-intent v3 source == branch; CI 37919460950 + 37919453992 green
+- [x] Owner decisions: Warisan.org = warisan.org; PR to main approved to open; hosting = later; H-9 = later
+- [x] set-user-role CORS allow-list for warisan.org (+ dev ports), deno check added to CI
+- [ ] Redeploy set-user-role (Hermes)
+- [ ] Review/merge PR https://github.com/fahru76/Warisan/pull/2 (owner/Hermes)
+- [ ] Hosting decision (owner) → Auth URLs, preview ALLOWED_ORIGINS
+
+## 2026-10-22: repository reset recovery (Claude)
+- [x] Restore `claude/ecstatic-franklin-5j4zw0` (main + 10 commits) to GitHub
+- [ ] Codex: reconcile the takeover assessment/board with the restored commits (see handoff 2026-10-22)
+- [ ] Review and merge this branch into main before any Edge Function redeploy or migration push
+- [ ] Redeploy `set-user-role` (warisan.org allow-list), with owner authorization
+- [ ] Restore Claude's Supabase access, or have another agent re-verify the live TimeZone and payment-function v3
+- [x] SEED-1: legacy-safe seed reruns (fixed ids + name/title guard; PGlite scenarios A–D) — Claude 2026-10-22
+- [x] Smoke P3: /workshops always visited (all titles or empty state) — Claude 2026-10-22
+- [x] Smoke CI: replaced hanging `playwright install --with-deps` with the runner's preinstalled Chrome (install ~3 s)
+- [ ] Owner: re-add Actions secrets `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (lost in repo reset), then re-run live-shop-smoke

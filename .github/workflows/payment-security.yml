@@ -2,7 +2,7 @@ name: Payment security tests
 on:
   workflow_dispatch:
   push:
-    paths: ['supabase/functions/create-payment-intent/**', '.github/workflows/payment-security.yml']
+    paths: ['supabase/functions/create-payment-intent/**', 'supabase/functions/set-user-role/**', '.github/workflows/payment-security.yml']
 permissions:
   contents: read
 jobs:
@@ -15,3 +15,4 @@ jobs:
           deno-version: v2.x
       - run: deno test supabase/functions/create-payment-intent/handler_test.ts
       - run: deno check supabase/functions/create-payment-intent/index.ts
+      - run: deno check supabase/functions/set-user-role/index.ts
