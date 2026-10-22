@@ -185,3 +185,10 @@
 - [ ] Redeploy set-user-role (Hermes)
 - [ ] Review/merge PR https://github.com/fahru76/Warisan/pull/2 (owner/Hermes)
 - [ ] Hosting decision (owner) → Auth URLs, preview ALLOWED_ORIGINS
+
+## 2026-10-22: repository reset recovery (Claude)
+- [x] Restore `claude/ecstatic-franklin-5j4zw0` (main + 10 commits) to GitHub
+- [ ] Codex: reconcile the takeover assessment/board with the restored commits (see handoff 2026-10-22)
+- [ ] Review and merge this branch into main before any Edge Function redeploy or migration push
+- [ ] Redeploy `set-user-role` (warisan.org allow-list), with owner authorization
+- [ ] Restore Claude's Supabase access, or have another agent re-verify the live TimeZone and payment-function v3

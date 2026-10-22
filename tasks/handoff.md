@@ -378,3 +378,19 @@ Change: `set-user-role` now echoes `Access-Control-Allow-Origin` only for `https
 
 Hermes next step: **redeploy `set-user-role`**. Live it still returns `*` until then.
 - **PR opened for review:** https://github.com/fahru76/Warisan/pull/2 (`claude/ecstatic-franklin-5j4zw0` → `main`). It has no conflicts, because `main` is an ancestor of the branch. Payment security CI run 37920134009 is green, including the `set-user-role` `deno check`. Merge only after product-owner or Hermes review.
+
+## Claude: branch restored after repository reset (2026-10-22)
+For Codex as coordinator: please reconcile this with `codex/ai-coordination-takeover`.
+- On 2026-10-22 the GitHub repo showed only `main` (`22e733e`) and `codex/ai-coordination-takeover`. This branch, `claude/new-session-b00fhf`, `feat/org-bilingual-privacy` and PR #2 were gone (PR #2 returned 404; PR numbering restarted at #1).
+- I restored this branch (`claude/ecstatic-franklin-5j4zw0`, head `fbb640f`) from Claude's container after the owner fixed push access. It is `main` (`22e733e`) plus 10 commits:
+  - `f7206b9` live smoke on push (detail, checkout gate, workshops);
+  - `c5dfbcd` H-15 seed IDs pinned to live, H-5 timezone migration `20261009000800`, H-10 payment CORS allow-list;
+  - `d91e1a6` `set-user-role` CORS allow-list for warisan.org;
+  - documentation commits.
+- **GitHub vs production gap.** As of the last live check (2026-10-09), production already ran code that is only on this branch: migration `20261009000800` (TimeZone `Asia/Kuala_Lumpur`) and `create-payment-intent` v3 with the origin allow-list. Do **not** redeploy Edge Functions or push migrations from `main` until this branch is merged; doing so would restore wildcard CORS and diverge from the live migration history.
+- Corrections to `tasks/takeover-assessment-2026-10-22.md`:
+  - Payment CORS is no longer a wildcard (fixed in `c5dfbcd` and deployed live as v3).
+  - A live-shop-smoke run did pass: run 37918314667 on 2026-10-09. Its record is not visible in the recreated repo.
+  - H-5, H-10 (payment function) and H-15 are done. Only the `set-user-role` redeploy remains.
+- Claude's Supabase MCP access returns "permission denied" as of 2026-10-22, so none of the above could be re-verified live today.
+- Still lost and not restored: `claude/new-session-b00fhf` (fully contained in this branch) and `feat/org-bilingual-privacy` (superseded). Neither is needed.
