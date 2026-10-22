@@ -2,6 +2,8 @@
 
 Current coordination (2026-10-22): Codex replaces Hermes. Use `agent-board.md` for accepted work and `ai-coordination.md` for ownership/handoffs. Historical checkboxes below conflict in places; use the dated takeover assessment to triage them, and obtain fresh evidence before repeating a live operation.
 
+Recovery reconciliation: H-5, H-10 payment CORS, H-15 and live catalogue/detail/anonymous-checkout/workshops smoke were completed in restored commits through `e056997`; older unchecked rows are superseded. `set-user-role` CORS deployment, authenticated E2E and hosting-dependent configuration remain pending. Read `restored-branch-review-2026-10-22.md` before merge or deployment planning; never push migrations or redeploy functions from unreconciled main.
+
 ## Phase 0: GitHub-only foundation
 - [x] Confirm GitHub repository is the canonical workspace
 - [x] Remove local repository clone

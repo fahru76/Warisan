@@ -3,6 +3,8 @@
 ## Current coordination — 2026-10-22
 Codex replaces Hermes as coordinator. Read `ai-coordination.md`, `agent-board.md`, and `takeover-assessment-2026-10-22.md` before acting on older tickets. Entries below retain historical evidence, including superseded pending/completed states; they are not new assignments. The old no-clone rule was specific to Hermes's environment.
 
+Reconciliation: Claude restored `claude/ecstatic-franklin-5j4zw0` at `e056997` (main + ten recovered commits + the restoration note). H-5, H-10 payment CORS, H-15 and the historical live smoke pass are complete per restored evidence. Keep Edge Function redeploys and migration pushes from old main on hold until recovery is merged and parity checked. `set-user-role` CORS redeployment remains separately pending and needs owner authorization. Full review and current evidence: `restored-branch-review-2026-10-22.md`. The restored branch's appended history is preserved on that branch; this summary does not copy or replace it.
+
 ## Status
 Hermes backend foundation and P0 authorization remediation are in GitHub and applied to the live Supabase project.
 
