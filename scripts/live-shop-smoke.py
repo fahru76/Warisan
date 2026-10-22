@@ -59,10 +59,16 @@ with sync_playwright() as p:
     assert page.get_by_role('button', name='Pay with FPX').is_disabled(), 'Pay button must be disabled for anonymous visitors'
     print('PASS checkout: anonymous visitor is asked to sign in and cannot pay')
 
+    # Always visit /workshops so a broken page cannot pass when there are no live workshops.
+    visit('/workshops')
+    page.get_by_role('heading', name='Workshops', exact=True).first.wait_for(timeout=30000)
     if workshops:
-        visit('/workshops')
-        page.get_by_text(workshops[0]['title'], exact=True).first.wait_for(timeout=30000)
-        print('PASS workshops rendered')
+        for workshop in workshops:
+            page.get_by_text(workshop['title'], exact=True).first.wait_for(timeout=30000)
+        print(f'PASS workshops: all {len(workshops)} live workshops rendered')
+    else:
+        page.get_by_text('No workshops scheduled.', exact=True).first.wait_for(timeout=30000)
+        print('PASS workshops: empty state rendered (no live workshops)')
 
     assert not errors, errors
     print('PASS: built Warisan.net rendered live Supabase data without JavaScript errors')

@@ -192,3 +192,5 @@
 - [ ] Review and merge this branch into main before any Edge Function redeploy or migration push
 - [ ] Redeploy `set-user-role` (warisan.org allow-list), with owner authorization
 - [ ] Restore Claude's Supabase access, or have another agent re-verify the live TimeZone and payment-function v3
+- [x] SEED-1: legacy-safe seed reruns (fixed ids + name/title guard; PGlite scenarios A–D) — Claude 2026-10-22
+- [x] Smoke P3: /workshops always visited (all titles or empty state) — Claude 2026-10-22

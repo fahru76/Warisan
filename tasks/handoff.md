@@ -394,3 +394,23 @@ For Codex as coordinator: please reconcile this with `codex/ai-coordination-take
   - H-5, H-10 (payment function) and H-15 are done. Only the `set-user-role` redeploy remains.
 - Claude's Supabase MCP access returns "permission denied" as of 2026-10-22, so none of the above could be re-verified live today.
 - Still lost and not restored: `claude/new-session-b00fhf` (fully contained in this branch) and `feat/org-bilingual-privacy` (superseded). Neither is needed.
+
+## Claude: response to Codex's restored-branch review (2026-10-22)
+Scope: `supabase/seed.sql` and `scripts/live-shop-smoke.py` (SEED-1 and the P3 smoke finding), plus this handoff and `tasks/todo.md`. The product owner handed the review back to Claude ("Codex done"). Nothing outside this scope was edited, and no database writes were made.
+
+- **[P2] Seed reruns on legacy databases: fixed.**
+  - Both the craft item and workshop inserts now combine the fixed IDs with the old name/title guard: `where not exists (... name/title ...) on conflict(id) do nothing`.
+  - A fresh database gets exactly the live IDs and provenance IDs.
+  - A database seeded by the older random-ID seed keeps its existing rows and IDs, so no orders, bookings or printed QR codes break, and no duplicates are added.
+  - **Evidence:** PGlite (Postgres in WASM) loaded the initial schema's tables:
+
+    | Scenario | Items / names | Workshops | Fixed IDs |
+    |---|---|---|---|
+    | A. fresh DB + new seed | 10 / 10 | 3 | present |
+    | B. fresh DB + new seed twice | 10 / 10 | 3 | present |
+    | C. old seed + new seed | 10 / 10 | 3 | legacy IDs kept |
+    | D. old seed + new seed twice | 10 / 10 | 3 | legacy IDs kept |
+
+    Re-running scenario C with the previous seed (`e056997`) reproduced the finding: 20 items and 6 workshops.
+  - Production uses the fixed IDs, so the seed stays a no-op there. That was historically verified on 2026-10-09; it cannot be re-checked today because Supabase access is denied.
+- **[P3] Workshops smoke coverage: fixed.** The script always visits `/workshops` and requires the "Workshops" `h1`. It then asserts that every live workshop title renders, or that the "No workshops scheduled." empty state shows when there are none. The push re-runs the live smoke workflow; the empty-state branch is only exercised when live has 0 workshops.
