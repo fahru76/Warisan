@@ -20,7 +20,7 @@ Fresh GitHub inspection found successful baseline runs:
 - [Workspace validation 38939262527](https://github.com/fahru76/Warisan/actions/runs/38939262527)
 - [Payment security 38939267603](https://github.com/fahru76/Warisan/actions/runs/38939267603)
 
-The initial returned run list omitted historical live smoke because the repository had been reset. Restored handoff reports smoke run `37918314667` passed on 2026-10-09; its original run record is unavailable in the recreated repository. Current payment-security run `39805789882` passed on recovered `fbb640f`; `e056997` adds documentation only. Current smoke run `39805789875` was in progress at first reconciliation; see the review record for the latest observed state. No migration, Auth configuration change, user creation or payment was performed. Historical production reports remain distinct from fresh verification.
+The initial returned run list omitted historical live smoke because the repository had been reset. Restored handoff reports smoke run `37918314667` passed on 2026-10-09; its original run record is unavailable in the recreated repository. Current payment-security run `39805789882` passed on recovered `fbb640f`; `e056997` adds documentation only. Current smoke run `39805789875` subsequently completed as cancelled; it provides no fresh passing result. No migration, Auth configuration change, user creation or payment was performed. Historical production reports remain distinct from fresh verification.
 
 ## Existing local work: preserve before integration
 

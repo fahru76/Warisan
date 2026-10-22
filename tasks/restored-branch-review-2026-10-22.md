@@ -28,7 +28,7 @@ Fresh local checks on detached e056997 in `work/restored-review`:
 - `pnpm typecheck`: three tasks passed. `pnpm build`: both apps passed. The environment used Turbo 2.11.7 and emitted existing bundle-size warnings; configuration was not changed.
 - `git diff --check` passed and the review checkout stayed clean.
 - [Current payment-security run 39805789882](https://github.com/fahru76/Warisan/actions/runs/39805789882): passed twelve payment tests and checked both Edge Function entry points at fbb640f. Only tasks/handoff.md and tasks/todo.md differ from that tested SHA to e056997.
-- [Current live smoke run 39805789875](https://github.com/fahru76/Warisan/actions/runs/39805789875): still in progress at the latest observation; do not count it as passed. No additional live test was dispatched by Codex.
+- [Current live smoke run 39805789875](https://github.com/fahru76/Warisan/actions/runs/39805789875): completed as cancelled at the latest observation; do not count it as passed. No additional live test was dispatched by Codex.
 
 Historical evidence recovered in the branch: smoke run 37918314667 passed on 2026-10-09; H-5 migration 000800 and payment v3 were applied and independently checked then; H-15 IDs matched production and a rolled-back seed rerun there was a no-op. These historical Actions records are not available in the recreated repository. Claude reports Supabase access denied on 2026-10-22. No current production-parity verification is claimed.
 
