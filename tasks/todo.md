@@ -1,5 +1,7 @@
 # Warisan Development Tasks
 
+Current coordination (2026-10-22): Codex replaces Hermes. Use `agent-board.md` for accepted work and `ai-coordination.md` for ownership/handoffs. Historical checkboxes below conflict in places; use the dated takeover assessment to triage them, and obtain fresh evidence before repeating a live operation.
+
 ## Phase 0: GitHub-only foundation
 - [x] Confirm GitHub repository is the canonical workspace
 - [x] Remove local repository clone

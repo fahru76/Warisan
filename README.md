@@ -28,6 +28,7 @@ pnpm validate
 
 ## Workspace protocol
 
-- `tasks/todo.md` — plan + progress, `tasks/lessons.md` — corrections, `tasks/handoff.md` — Claude ⇄ Hermes tickets.
+- `AGENTS.md` — agent entry point; `tasks/ai-coordination.md` — Codex/Gemini Argon/Claude protocol; `tasks/agent-board.md` — current ownership.
+- `tasks/todo.md` — backlog, `tasks/lessons.md` — corrections, `tasks/handoff.md` — historical handoffs.
 - `evals/` — success criteria written before code.
 - Secrets never committed; only `VITE_`-prefixed public keys reach browser code.

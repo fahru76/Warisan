@@ -1,3 +1,11 @@
+# Warisan agent entry point
+
+Effective 2026-10-22: Codex replaces Hermes as coordinator. The collaborating agents are Codex, Gemini Argon, and Claude. Hermes references in older records are historical.
+
+Before planning, claiming, editing, reviewing, or handing off work, read `tasks/ai-coordination.md` and the current section of `tasks/agent-board.md`. Read `tasks/takeover-assessment-2026-10-22.md` when reconciling older handoffs or the separate local frontend. Follow deeper directory instructions when present.
+
+If `.codegraph/` exists at the repository root, use CodeGraph before text search or file reads to locate or understand code. Otherwise skip CodeGraph; do not create an index without the user's direction.
+
 <!-- BEGIN:turborepo-agent-rules -->
 
 # This is NOT the Turborepo you know

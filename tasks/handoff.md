@@ -1,10 +1,13 @@
 # Agent Handoff
 
+## Current coordination — 2026-10-22
+Codex replaces Hermes as coordinator. Read `ai-coordination.md`, `agent-board.md`, and `takeover-assessment-2026-10-22.md` before acting on older tickets. Entries below retain historical evidence, including superseded pending/completed states; they are not new assignments. The old no-clone rule was specific to Hermes's environment.
+
 ## Status
 Hermes backend foundation and P0 authorization remediation are in GitHub and applied to the live Supabase project.
 
 ## Workspace contract
-GitHub is the only workspace. Do not clone or use a local repository.
+Historical Hermes environment: GitHub-only editing. Current workspace contract: `ai-coordination.md`.
 
 ## Backend contract
 - `supabase/migrations/20261007000100_initial_schema.sql`
