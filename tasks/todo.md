@@ -194,3 +194,5 @@
 - [ ] Restore Claude's Supabase access, or have another agent re-verify the live TimeZone and payment-function v3
 - [x] SEED-1: legacy-safe seed reruns (fixed ids + name/title guard; PGlite scenarios A–D) — Claude 2026-10-22
 - [x] Smoke P3: /workshops always visited (all titles or empty state) — Claude 2026-10-22
+- [x] Smoke CI: replaced hanging `playwright install --with-deps` with the runner's preinstalled Chrome (install ~3 s)
+- [ ] Owner: re-add Actions secrets `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (lost in repo reset), then re-run live-shop-smoke
