@@ -2,7 +2,7 @@
 
 Effective 2026-10-22: Codex replaces Hermes as coordinator. The collaborating agents are Codex, Gemini Argon, and Claude. Hermes references in older records are historical.
 
-Deployment hold: main at `22e733e` predates restored branch `claude/ecstatic-franklin-5j4zw0` (`e056997`). Production reportedly already runs migration `20261009000800` and payment function v3 from that branch. Do not redeploy Edge Functions or push migrations from main before the recovery is merged and deployed-state parity is checked. See `tasks/restored-branch-review-2026-10-22.md`.
+Deployment hold: main at `22e733e` predates restored branch `claude/ecstatic-franklin-5j4zw0` (reviewed through `637b2bb`). Production reportedly already runs migration `20261009000800` and payment function v3 from that branch. Do not redeploy Edge Functions or push migrations from main before the recovery is merged and deployed-state parity is checked. See `tasks/restored-branch-review-2026-10-22.md`.
 
 Before planning, claiming, editing, reviewing, or handing off work, read `tasks/ai-coordination.md` and the current section of `tasks/agent-board.md`. Read `tasks/takeover-assessment-2026-10-22.md` when reconciling older handoffs or the separate local frontend. Follow deeper directory instructions when present.
 

@@ -4,6 +4,8 @@ Current coordination (2026-10-22): Codex replaces Hermes. Use `agent-board.md` f
 
 Recovery reconciliation: H-5, H-10 payment CORS, H-15 and live catalogue/detail/anonymous-checkout/workshops smoke were completed in restored commits through `e056997`; older unchecked rows are superseded. `set-user-role` CORS deployment, authenticated E2E and hosting-dependent configuration remain pending. Read `restored-branch-review-2026-10-22.md` before merge or deployment planning; never push migrations or redeploy functions from unreconciled main.
 
+Review follow-up at 637b2bb: SEED-1 and P3 workshops-route coverage are resolved and reviewed; exact-head validation 39808321727 passed. Remaining smoke blocker: owner restores Actions secrets VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, then reruns failed run 39808203459. No fresh smoke pass or production parity claimed; recovery PR #2 remains draft/unmerged.
+
 ## Phase 0: GitHub-only foundation
 - [x] Confirm GitHub repository is the canonical workspace
 - [x] Remove local repository clone

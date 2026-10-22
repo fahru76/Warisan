@@ -5,6 +5,8 @@ Codex replaces Hermes as coordinator. Read `ai-coordination.md`, `agent-board.md
 
 Reconciliation: Claude restored `claude/ecstatic-franklin-5j4zw0` at `e056997` (main + ten recovered commits + the restoration note). H-5, H-10 payment CORS, H-15 and the historical live smoke pass are complete per restored evidence. Keep Edge Function redeploys and migration pushes from old main on hold until recovery is merged and parity checked. `set-user-role` CORS redeployment remains separately pending and needs owner authorization. Full review and current evidence: `restored-branch-review-2026-10-22.md`. The restored branch's appended history is preserved on that branch; this summary does not copy or replace it.
 
+Follow-up at 637b2bb: Codex closed P2 seed and P3 workshop smoke findings after review; independent PGlite scenarios pass with 10 items / 3 workshops and existing IDs unchanged. Exact-head Validate run 39808321727 passed. Chrome dependency installation no longer stalls, but smoke 39808203459 fails before browser/live calls because both VITE_SUPABASE_* Actions secrets are absent (secret-name listing independently empty). Owner restores the two secrets and reruns smoke. Current production parity is still unverified. Nothing merged/deployed by Codex; see board CONFIG-1 and VERIFY-1.
+
 ## Status
 Hermes backend foundation and P0 authorization remediation are in GitHub and applied to the live Supabase project.
 

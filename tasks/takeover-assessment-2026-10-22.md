@@ -4,6 +4,8 @@ Inspected 2026-10-22, Asia/Kuala_Lumpur. Repository: https://github.com/fahru76/
 
 Reconciled later on 2026-10-22 after Claude restored `claude/ecstatic-franklin-5j4zw0` at `e056997e9c246a46a1cb16708d704944b48e273a`. It contains the ten lost commits plus a restoration note, all descending from the baseline above. The original assessment had incomplete history: its missing-smoke and open-H-5/H-10/H-15 conclusions are superseded below. Full source review: `restored-branch-review-2026-10-22.md`.
 
+Latest follow-up: restored head `637b2bb` closes both initial review findings. Codex independently verified fresh/repeated/legacy seed behavior in PGlite (10 items / 3 workshops, IDs preserved) and reviewed unconditional workshops smoke coverage. Exact-head Validate run 39808321727 passed. Latest smoke run 39808203459 failed at missing configuration before browser/live calls; repository Actions secret listing is empty. Owner must restore VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY and rerun smoke. Production parity remains unverified and deployments remain on hold.
+
 ## Architecture observed in source
 
 - pnpm/Turborepo monorepo: React/TypeScript/Vite apps in `apps/org` (provenance, verified artisan directory, registration/admin) and `apps/net` (catalogue, workshops, checkout, account/orders).
@@ -38,7 +40,7 @@ Hermes is retired and Codex now coordinates. The former GitHub-only rule conflic
 Reconciled next priorities (no source implementation assigned yet):
 
 1. Preserve and identify Gemini's intended frontend variant; obtain a scoped integration proposal before moving it into either app.
-2. Review and integrate the recovered commits before deployments from main. Preserve deployed migration 000800 and payment v3 origin checks; resolve the legacy seed rerun issue. Historical catalogue smoke already passed. Record fresh smoke evidence and define separate signup/consent/order/booking coverage without credentials.
+2. Review and integrate the recovered commits before deployments from main. Preserve deployed migration 000800 and payment v3 origin checks; the seed rerun issue is resolved at 637b2bb. Historical catalogue smoke already passed. Restore missing Actions secrets for fresh smoke, and define separate signup/consent/order/booking coverage without recording credentials.
 3. Resolve hosting/preview choice before Auth Site URL, redirect allow-list and production CORS changes. Existing notes report localhost:3000; this was not reverified live. Actions secrets are not proof a hosting preview has variables configured.
 4. H-5 timezone and H-10 payment CORS are complete per 2026-10-09 live evidence; H-15 fixed IDs are complete in recovered Git. Only set-user-role CORS deployment remains, with separate authorization. H-9 image columns are deferred; H-8 provenance RPC is optional. Current live parity was not reverified: Claude reports Supabase access denied on 2026-10-22. Superseded frontend branches must not be blindly reintroduced.
 

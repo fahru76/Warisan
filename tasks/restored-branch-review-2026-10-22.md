@@ -1,8 +1,23 @@
 # Restored branch merge review — 2026-10-22
 
+## Current verdict — follow-up at 637b2bb
+
+Reviewed `e056997..637b2bbe0b704d63a599f634b4a0ddd1c705126b`, three follow-up commits on `claude/ecstatic-franklin-5j4zw0`. Both initial findings below are resolved in source; separate Standards and Spec re-reviews found no new actionable defects. No source-review blocker remains. PR #2 stays draft and unmerged; this review does not grant merge or deployment approval. Fresh smoke and production verification remain incomplete.
+
+- **Standards / P2 closed:** fixed UUIDs plus name/title guards preserve old rows and avoid duplicate catalogue entries. Codex independently ran PGlite against the initial schema's tables (not Supabase Auth/RLS): fresh, repeat, legacy + new, and legacy + new twice all produce 10 items / 3 workshops. Repeated fixed IDs and every legacy ID/provenance value remained unchanged. The previous e056997 seed reproduced 20 items / 6 workshops on legacy. Legacy environments intentionally retain different IDs; convergence requires a separately planned migration, never rewriting referenced IDs during seeding.
+- **Spec / P3 closed:** `/workshops` is visited unconditionally, with a heading and either every returned title or the application's empty-state text checked. Source strings match the app. Live browser/empty-state execution is not claimed.
+- **Smoke setup:** the workflow installs pinned Python Playwright only and launches `channel='chrome'`. [Run 39808203459](https://github.com/fahru76/Warisan/actions/runs/39808203459) completed installation quickly, then failed with `Missing VITE_SUPABASE_* configuration`. This verifies removal of the stalled apt installation, not successful Chrome launch or a passing live smoke.
+- **Current CI:** [Validate 39808321727](https://github.com/fahru76/Warisan/actions/runs/39808321727) passed at exact head 637b2bb (install, validation, typecheck, test, build). Earlier reported validate 39808018331 passed at c45f745. Function source is unchanged since the successful payment-security run 39805789882.
+- **Configuration blocker independently verified:** repository Actions secret-name listing returned no entries. The workflow references missing `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. Owner restores these through repository Settings -> Secrets and variables -> Actions, then reruns the failed run or dispatches `live-shop-smoke.yml`. No secret values were read, requested in chat, or changed. A rerun of the failed push run is available before recovery merge.
+- **Production:** Claude still reports Supabase access denied; no fresh deployed-state verification occurred. Preserve the deployment hold and separately authorized set-user-role deployment task.
+
+Current totals: Standards 0 open; Spec 0 open. Independent seed checks passed; live smoke blocked by configuration. The initial review below is retained as history and its findings/recommendation are superseded by this verdict.
+
+## Initial review at e056997 (historical)
+
 Reviewed `origin/main` = `22e733e366d09bbd53339d1f97f094c4da6dc316` against `origin/claude/ecstatic-franklin-5j4zw0` = `e056997e9c246a46a1cb16708d704944b48e273a` using `git diff origin/main...origin/claude/ecstatic-franklin-5j4zw0`. The head is main plus ten recovered commits and the restoration note (eleven commits total). Twelve files differ. No recovered source was edited during review.
 
-Recommendation: request a scoped resolution or explicit operational restriction for the P2 seed rerun risk before merging. The P3 smoke coverage issue is non-blocking. Review is not approval to merge or deploy. No functions, migrations, seeds, Auth configuration or secrets were deployed/changed.
+Initial recommendation (now superseded): resolve the P2 seed rerun risk before merging. P3 was non-blocking. No functions, migrations, seeds, Auth configuration or secrets were deployed/changed.
 
 Current review artifact: [draft PR #2](https://github.com/fahru76/Warisan/pull/2), created after the reset for head e056997. Its number happens to match the lost PR; validate the head rather than treating it as the historical review record.
 
@@ -32,12 +47,12 @@ Fresh local checks on detached e056997 in `work/restored-review`:
 
 Historical evidence recovered in the branch: smoke run 37918314667 passed on 2026-10-09; H-5 migration 000800 and payment v3 were applied and independently checked then; H-15 IDs matched production and a rolled-back seed rerun there was a no-op. These historical Actions records are not available in the recreated repository. Claude reports Supabase access denied on 2026-10-22. No current production-parity verification is claimed.
 
-## Integration order and remaining ownership
+## Integration order and remaining ownership (updated)
 
-1. Address/explicitly constrain SEED-1, publish a reviewed follow-up, and rerun affected checks. Keep recovery changes intact; do not rewrite Claude's branch or applied migration history.
+1. SEED-1 and smoke P3 are closed at 637b2bb. Restore the missing Actions secrets and rerun the failed smoke for fresh evidence. Keep recovered code and applied migration history intact.
 2. Review and merge the recovered branch through a current PR with validation. Product-owner merge approval remains pending. The old PR #2 is historical; inspect the current PR's head rather than trusting the old number.
 3. Integrate the coordination documentation PR and preserve both the recovered appended history and the current handoff header. Both branches start from 22e733e; one appends history and the other adds the header, so neither should replace the other file wholesale.
 4. Verify actual deployed migration history/timezone and payment-function source against the integrated revision using restored read-only access. Keep all Edge Function redeploys/migration pushes from unreconciled main blocked.
 5. Treat set-user-role CORS deployment as a separate authorized operation. Hosting-dependent Auth/preview settings and H-9 remain deferred; authenticated signup/checkout/booking E2E is still outstanding. Historical anonymous smoke does not close that gate.
 
-Review totals: Standards 1 finding (P2 seed reruns); Spec 1 finding (P3 conditional workshop smoke).
+Historical initial totals: Standards 1 finding (P2 seed reruns); Spec 1 finding (P3 conditional workshop smoke). Both are closed by the current verdict above.
