@@ -36,7 +36,8 @@ else:
 
 DEMO_TEXT = 'Showing demo data'
 with sync_playwright() as p:
-    browser = p.chromium.launch()
+    # channel='chrome' uses the runner's preinstalled Google Chrome (no browser download or apt step).
+    browser = p.chromium.launch(channel='chrome')
     page = browser.new_page(viewport={'width': 1280, 'height': 900}, locale='en-US')
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
